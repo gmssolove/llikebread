@@ -3,323 +3,587 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>다솜의 세계들</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Noto+Serif+JP:wght@400;500&family=Noto+Sans+KR:wght@300;400;500&display=swap" rel="stylesheet">
+<title>dasom's world</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=IM+Fell+English:ital@0;1&family=Noto+Sans+KR:wght@400;500&display=swap" rel="stylesheet">
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
 :root {
-  --bg: #1a1018;
-  --bg2: #241a22;
-  --bg3: #2e2030;
-  --pink: #e5a9bf;
-  --pink-light: #fdd6dd;
-  --pink-dim: #a06080;
-  --pink-dark: #6b3a52;
-  --text: #fdd6dd;
-  --text-dim: #c9a0b4;
-  --text-muted: #7a5568;
-  --border: rgba(229,169,191,0.2);
-  --border-strong: rgba(229,169,191,0.4);
+  --bg:#1a1018; --bg2:#241a22; --bg3:#2e2030;
+  --pink:#e5a9bf; --pink-light:#fdd6dd; --pink-dim:#a06080; --pink-dark:#6b3a52;
+  --text:#fdd6dd; --text-dim:#c9a0b4; --text-muted:#7a5568;
+  --border:rgba(229,169,191,0.18); --border-strong:rgba(229,169,191,0.38);
 }
-html { scroll-behavior:smooth; }
+html,body { height:100%; }
 body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: 'Noto Sans KR', sans-serif;
-  font-weight: 400;
-  min-height: 100vh;
-  overflow-x: hidden;
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Noto Sans KR',sans-serif;
+  font-weight:400;
+  overflow:hidden;
+  height:100vh;
 }
 
-/* BG NOISE / ATMOSPHERE */
-body::before {
-  content:'';
-  position:fixed;
-  inset:0;
+/* BG */
+.bg-layer {
+  position:fixed; inset:0; z-index:0;
   background:
-    radial-gradient(ellipse at 20% 20%, rgba(229,169,191,0.07) 0%, transparent 50%),
-    radial-gradient(ellipse at 80% 80%, rgba(55,45,54,0.6) 0%, transparent 50%),
-    radial-gradient(ellipse at 60% 10%, rgba(180,100,140,0.06) 0%, transparent 40%);
-  pointer-events:none;
-  z-index:0;
+    radial-gradient(ellipse at 15% 50%, rgba(229,169,191,0.06) 0%, transparent 55%),
+    radial-gradient(ellipse at 85% 30%, rgba(55,45,54,0.8) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 90%, rgba(107,58,82,0.08) 0%, transparent 40%);
 }
 
-/* NAV */
-nav {
-  position:fixed; top:0; left:0; right:0; z-index:100;
-  padding:1.5rem 2.5rem;
-  display:flex; align-items:center; justify-content:space-between;
+.bg-deco {
+  position:fixed; z-index:0; pointer-events:none; user-select:none;
+  font-family:'IM Fell English',serif; font-style:italic;
+  color:rgba(229,169,191,0.03);
 }
-.nav-name {
-  font-family:'Cormorant Garamond', serif;
-  font-style:italic;
-  font-size:18px;
-  color:var(--pink);
-  letter-spacing:0.1em;
-}
-.nav-hint {
-  font-size:10px;
-  color:var(--text-muted);
-  letter-spacing:0.2em;
-  text-transform:uppercase;
-}
+.bg-deco-1 { top:8%; left:3%; font-size:180px; line-height:1; }
+.bg-deco-2 { bottom:10%; right:3%; font-size:130px; line-height:1; }
 
-/* HERO */
-.hero {
+/* LAYOUT */
+.layout {
   position:relative; z-index:1;
-  min-height:100vh;
+  display:grid;
+  grid-template-columns:320px 1fr;
+  height:100vh;
+}
+
+/* LEFT PANEL */
+.left-panel {
   display:flex;
   flex-direction:column;
-  align-items:center;
   justify-content:center;
-  padding:6rem 2rem 4rem;
-  text-align:center;
-}
-
-.hero-eyebrow {
-  font-size:10px;
-  letter-spacing:0.35em;
-  text-transform:uppercase;
-  color:var(--text-muted);
-  margin-bottom:1.5rem;
-}
-
-.hero-title {
-  font-family:'Cormorant Garamond', serif;
-  font-size:64px;
-  font-weight:500;
-  font-style:italic;
-  color:var(--text);
-  letter-spacing:0.05em;
-  line-height:1.1;
-  margin-bottom:0.8rem;
-}
-
-.hero-title span {
-  color:var(--pink);
-}
-
-.hero-sub {
-  font-size:13px;
-  color:var(--text-muted);
-  letter-spacing:0.1em;
-  margin-bottom:4rem;
-}
-
-.hero-divider {
-  display:flex;
-  align-items:center;
-  gap:16px;
-  margin-bottom:4rem;
-  width:100%;
-  max-width:500px;
-}
-.hero-divider-line { flex:1; height:1px; background:var(--border); }
-.hero-divider-dot {
-  width:4px; height:4px; border-radius:50%;
-  background:var(--pink-dim);
-}
-
-/* WORLD CARDS */
-.worlds {
-  position:relative; z-index:1;
-  display:flex;
-  gap:1.5rem;
-  justify-content:center;
-  flex-wrap:wrap;
-  padding:0 2rem 6rem;
-  max-width:1000px;
-  margin:0 auto;
-}
-
-.world-card {
-  width:280px;
-  background:var(--bg2);
-  border:1px solid var(--border);
-  padding:2rem;
-  text-decoration:none;
-  display:block;
-  transition:all 0.3s;
+  padding:3rem 2rem 3rem 3rem;
+  border-right:1px solid var(--border);
   position:relative;
   overflow:hidden;
 }
 
-.world-card::before {
+.left-panel::before {
   content:'';
-  position:absolute;
-  inset:0;
-  opacity:0;
-  transition:opacity 0.3s;
+  position:absolute; top:0; right:0; bottom:0; width:1px;
+  background:linear-gradient(to bottom, transparent, var(--pink-dim), transparent);
 }
 
-.world-card.kisaragi::before {
-  background:radial-gradient(ellipse at 50% 0%, rgba(139,26,26,0.15) 0%, transparent 70%);
+/* SITE TITLE */
+.site-title-wrap {
+  margin-bottom:3rem;
 }
-.world-card.yundan::before {
-  background:radial-gradient(ellipse at 50% 0%, rgba(229,169,191,0.1) 0%, transparent 70%);
+.site-title {
+  font-family:'IM Fell English',serif;
+  font-style:italic;
+  font-size:38px;
+  color:var(--text);
+  line-height:1.1;
+  letter-spacing:0.02em;
 }
-.world-card.add::before {
-  background:radial-gradient(ellipse at 50% 0%, rgba(229,169,191,0.05) 0%, transparent 70%);
-}
-
-.world-card:hover { border-color:var(--border-strong); transform:translateY(-4px); }
-.world-card:hover::before { opacity:1; }
-
-.world-card-tag {
-  font-size:9px;
-  letter-spacing:0.25em;
+.site-title span { color:var(--pink); }
+.site-subtitle {
+  font-size:10px;
+  letter-spacing:0.3em;
   text-transform:uppercase;
   color:var(--text-muted);
-  margin-bottom:1.2rem;
+  margin-top:0.5rem;
 }
 
-.world-card-icon {
-  font-family:'Noto Serif JP', serif;
-  font-size:36px;
-  font-weight:400;
-  margin-bottom:1rem;
-  line-height:1;
+/* NAV */
+nav { display:flex; flex-direction:column; gap:2px; }
+
+.nav-item {
+  position:relative;
+  display:flex;
+  align-items:center;
+  cursor:pointer;
+  padding:6px 0;
+  text-decoration:none;
+  group:true;
 }
 
-.world-card.kisaragi .world-card-icon { color:rgba(192,57,43,0.7); }
-.world-card.yundan .world-card-icon { color:var(--pink-dim); }
-.world-card.add .world-card-icon { color:var(--text-muted); }
-
-.world-card-title {
-  font-family:'Cormorant Garamond', serif;
-  font-size:22px;
-  font-weight:500;
-  color:var(--text);
-  letter-spacing:0.05em;
-  margin-bottom:0.4rem;
-  line-height:1.2;
+.nav-item-inner {
+  display:flex;
+  align-items:center;
+  gap:0;
+  width:100%;
+  transition:transform 0.25s cubic-bezier(0.23,1,0.32,1);
 }
 
-.world-card-title-sub {
-  font-family:'Noto Serif JP', serif;
-  font-size:12px;
-  color:var(--text-muted);
-  letter-spacing:0.08em;
-  margin-bottom:1rem;
-}
+.nav-item:hover .nav-item-inner { transform:translateX(8px); }
+.nav-item.active .nav-item-inner { transform:translateX(10px); }
 
-.world-card-desc {
-  font-size:11px;
-  color:var(--text-muted);
-  line-height:1.8;
-  letter-spacing:0.03em;
-}
-
-.world-card-arrow {
-  position:absolute;
-  bottom:1.5rem;
-  right:1.5rem;
-  font-size:14px;
+.nav-slash {
+  font-family:'Cormorant Garamond',serif;
+  font-style:italic;
+  font-size:16px;
   color:var(--pink-dim);
+  width:20px;
+  flex-shrink:0;
   opacity:0;
-  transform:translateX(-6px);
-  transition:all 0.3s;
+  transition:opacity 0.2s;
 }
-.world-card:hover .world-card-arrow { opacity:1; transform:translateX(0); }
+.nav-item:hover .nav-slash,
+.nav-item.active .nav-slash { opacity:1; }
 
-.world-card.add {
-  border-style:dashed;
-  cursor:default;
-  opacity:0.5;
+.nav-label {
+  font-family:'IM Fell English',serif;
+  font-size:18px;
+  color:var(--text-muted);
+  letter-spacing:0.04em;
+  transition:color 0.2s;
+  line-height:1.3;
+}
+.nav-item:hover .nav-label { color:var(--text-dim); }
+.nav-item.active .nav-label { color:var(--pink-light); }
+
+.nav-line {
+  position:absolute;
+  left:-3rem; right:0;
+  bottom:0;
+  height:1px;
+  background:linear-gradient(to right, transparent, var(--border));
 }
 
-/* FOOTER */
-footer {
-  position:relative; z-index:1;
-  text-align:center;
-  padding:2rem;
+/* SUBMENU */
+.nav-sub {
+  display:none;
+  flex-direction:column;
+  gap:0;
+  padding:4px 0 4px 36px;
+  overflow:hidden;
+}
+.nav-sub.open { display:flex; }
+
+.nav-sub-item {
+  font-family:'Cormorant Garamond',serif;
+  font-style:italic;
+  font-size:14px;
+  color:var(--text-muted);
+  padding:4px 0;
+  cursor:pointer;
+  text-decoration:none;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  transition:color 0.2s, transform 0.2s;
+  letter-spacing:0.06em;
+}
+.nav-sub-item::before { content:'·'; color:var(--pink-dim); }
+.nav-sub-item:hover { color:var(--pink); transform:translateX(4px); }
+
+/* BOTTOM */
+.left-bottom {
+  margin-top:auto;
+  padding-top:2rem;
   font-size:10px;
   color:var(--text-muted);
-  letter-spacing:0.1em;
-  border-top:1px solid var(--border);
+  letter-spacing:0.08em;
+  line-height:1.8;
 }
 
-/* FLOATING DECO */
-.deco {
-  position:fixed;
-  pointer-events:none;
-  z-index:0;
-  font-family:'Cormorant Garamond', serif;
-  font-style:italic;
-  color:rgba(229,169,191,0.04);
-  user-select:none;
+/* RIGHT PANEL */
+.right-panel {
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  padding:3rem;
+  position:relative;
+  overflow:hidden;
 }
-.deco-1 { top:12%; left:5%; font-size:120px; }
-.deco-2 { bottom:15%; right:4%; font-size:90px; }
+
+/* CONTENT AREA */
+.content-area { width:100%; max-width:620px; }
+
+.content-block { display:none; }
+.content-block.active { display:block; animation:fadeIn 0.4s ease; }
+
+@keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+
+/* MAIN CONTENT */
+.main-eyebrow {
+  font-size:10px;
+  letter-spacing:0.3em;
+  text-transform:uppercase;
+  color:var(--text-muted);
+  margin-bottom:1.5rem;
+}
+.main-heading {
+  font-family:'IM Fell English',serif;
+  font-style:italic;
+  font-size:52px;
+  color:var(--text);
+  line-height:1.1;
+  margin-bottom:1rem;
+}
+.main-heading span { color:var(--pink); }
+.main-divider {
+  display:flex; align-items:center; gap:12px;
+  margin:1.5rem 0;
+}
+.main-divider-line { flex:1; height:1px; background:var(--border); }
+.main-divider-diamond {
+  width:5px; height:5px;
+  background:var(--pink-dim);
+  transform:rotate(45deg);
+}
+.main-desc {
+  font-size:12px;
+  color:var(--text-muted);
+  line-height:2;
+  letter-spacing:0.04em;
+  max-width:420px;
+}
+
+/* WORLD CARDS (세계관 서브) */
+.world-cards { display:flex; flex-direction:column; gap:12px; margin-top:1.5rem; }
+.world-card-item {
+  background:var(--bg2);
+  border:1px solid var(--border);
+  padding:1.25rem 1.5rem;
+  display:flex;
+  align-items:center;
+  gap:1.5rem;
+  cursor:pointer;
+  transition:all 0.25s;
+  text-decoration:none;
+}
+.world-card-item:hover { border-color:var(--border-strong); transform:translateX(6px); }
+.world-card-icon {
+  font-family:'Noto Serif JP',serif;
+  font-size:28px;
+  color:rgba(192,57,43,0.5);
+  width:40px; flex-shrink:0;
+  text-align:center;
+}
+.world-card-info { flex:1; }
+.world-card-name {
+  font-family:'IM Fell English',serif;
+  font-size:16px;
+  color:var(--text-dim);
+  letter-spacing:0.04em;
+  margin-bottom:3px;
+}
+.world-card-sub { font-size:11px; color:var(--text-muted); letter-spacing:0.06em; }
+.world-card-arrow { font-size:14px; color:var(--pink-dim); }
+
+/* GENERIC PAGE */
+.page-heading {
+  font-family:'IM Fell English',serif;
+  font-style:italic;
+  font-size:36px;
+  color:var(--text);
+  margin-bottom:0.5rem;
+}
+.page-sub {
+  font-size:11px;
+  letter-spacing:0.2em;
+  text-transform:uppercase;
+  color:var(--text-muted);
+  margin-bottom:2rem;
+  display:flex; align-items:center; gap:10px;
+}
+.page-sub::after { content:''; flex:1; height:1px; background:var(--border); }
+.page-coming {
+  font-size:13px;
+  color:var(--text-muted);
+  letter-spacing:0.08em;
+  font-family:'Cormorant Garamond',serif;
+  font-style:italic;
+  padding:2rem 0;
+}
+
+/* BGM */
+#bgm-player {
+  position:fixed; bottom:1.5rem; right:1.5rem; z-index:999;
+  background:rgba(26,16,24,0.96); border:1px solid var(--border);
+  backdrop-filter:blur(12px);
+  display:flex; align-items:center; gap:10px;
+  padding:10px 14px; min-width:220px; max-width:300px;
+  transition:all 0.3s;
+}
+#bgm-player.collapsed { min-width:0; max-width:none; width:44px; height:44px; padding:0; justify-content:center; }
+#bgm-player.collapsed #bgm-info,#bgm-player.collapsed #bgm-vol-wrap,#bgm-player.collapsed #bgm-toggle-collapse,#bgm-player.collapsed #bgm-play-btn { display:none; }
+#bgm-play-btn { width:28px; height:28px; flex-shrink:0; background:transparent; border:1px solid var(--pink-dim); color:var(--pink); cursor:pointer; font-size:11px; display:flex; align-items:center; justify-content:center; transition:all 0.2s; }
+#bgm-play-btn:hover { background:rgba(229,169,191,0.1); }
+#bgm-info { flex:1; min-width:0; }
+#bgm-title { font-size:10px; color:var(--text-dim); letter-spacing:0.06em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+#bgm-artist { font-size:9px; color:var(--text-muted); margin-top:2px; }
+#bgm-vol-wrap { display:flex; align-items:center; }
+#bgm-vol { width:55px; accent-color:var(--pink); cursor:pointer; }
+#bgm-toggle-collapse { background:transparent; border:none; color:var(--text-muted); cursor:pointer; font-size:11px; padding:2px 4px; flex-shrink:0; }
+#bgm-expand-btn { display:none; background:transparent; border:none; color:var(--pink); cursor:pointer; font-size:14px; width:100%; height:100%; align-items:center; justify-content:center; }
+#bgm-player.collapsed #bgm-expand-btn { display:flex; }
 </style>
 </head>
 <body>
 
-<div class="deco deco-1">世界</div>
-<div class="deco deco-2">物語</div>
+<div class="bg-layer"></div>
+<div class="bg-deco bg-deco-1">d</div>
+<div class="bg-deco bg-deco-2">世</div>
 
-<nav>
-  <div class="nav-name">dasom</div>
-  <div class="nav-hint">worlds & stories</div>
-</nav>
+<div class="layout">
+  <!-- LEFT -->
+  <div class="left-panel">
+    <div class="site-title-wrap">
+      <div class="site-title">dasom's<br><span>world</span></div>
+      <div class="site-subtitle">archive &amp; stories</div>
+    </div>
 
-<div class="hero">
-  <div class="hero-eyebrow">created by dasom</div>
-  <div class="hero-title">
-    다솜의<br><span>세계들</span>
+    <nav id="main-nav">
+
+      <div class="nav-item active" onclick="showPage('main')">
+        <div class="nav-item-inner">
+          <span class="nav-slash">/</span>
+          <span class="nav-label">Main</span>
+        </div>
+        <div class="nav-line"></div>
+      </div>
+
+      <div class="nav-item" onclick="showPage('notice')">
+        <div class="nav-item-inner">
+          <span class="nav-slash">/</span>
+          <span class="nav-label">Notice</span>
+        </div>
+        <div class="nav-line"></div>
+      </div>
+
+      <div class="nav-item" onclick="showPage('diary')">
+        <div class="nav-item-inner">
+          <span class="nav-slash">/</span>
+          <span class="nav-label">Diary</span>
+        </div>
+        <div class="nav-line"></div>
+      </div>
+
+      <div class="nav-item" onclick="showPage('gallery')">
+        <div class="nav-item-inner">
+          <span class="nav-slash">/</span>
+          <span class="nav-label">Gallery</span>
+        </div>
+        <div class="nav-line"></div>
+      </div>
+
+      <div class="nav-item" onclick="showPage('trpg')">
+        <div class="nav-item-inner">
+          <span class="nav-slash">/</span>
+          <span class="nav-label">TRPG</span>
+        </div>
+        <div class="nav-line"></div>
+      </div>
+
+      <div class="nav-item" onclick="showPage('universe')">
+        <div class="nav-item-inner">
+          <span class="nav-slash">/</span>
+          <span class="nav-label">Universe</span>
+        </div>
+        <div class="nav-line"></div>
+      </div>
+
+      <div class="nav-item" onclick="toggleSub('char-sub')">
+        <div class="nav-item-inner">
+          <span class="nav-slash">/</span>
+          <span class="nav-label">Character</span>
+        </div>
+        <div class="nav-line"></div>
+      </div>
+      <div class="nav-sub" id="char-sub">
+        <a href="characters.html" class="nav-sub-item">OC</a>
+        <a href="#" class="nav-sub-item">Pair</a>
+      </div>
+
+      <div class="nav-item" onclick="toggleSub('archive-sub')">
+        <div class="nav-item-inner">
+          <span class="nav-slash">/</span>
+          <span class="nav-label">Archive</span>
+        </div>
+        <div class="nav-line"></div>
+      </div>
+      <div class="nav-sub" id="archive-sub">
+        <a href="#" class="nav-sub-item">Review</a>
+        <a href="#" class="nav-sub-item">Scrap</a>
+        <a href="#" class="nav-sub-item">Music</a>
+      </div>
+
+      <div class="nav-item" onclick="showPage('guest')">
+        <div class="nav-item-inner">
+          <span class="nav-slash">/</span>
+          <span class="nav-label">Guest</span>
+        </div>
+        <div class="nav-line"></div>
+      </div>
+
+      <div class="nav-item" onclick="showPage('banner')">
+        <div class="nav-item-inner">
+          <span class="nav-slash">/</span>
+          <span class="nav-label">Banner</span>
+        </div>
+        <div class="nav-line"></div>
+      </div>
+
+    </nav>
+
+    <div class="left-bottom">
+      © dasom. all rights reserved.<br>
+      모든 창작물의 저작권은 작가에게 있습니다.
+    </div>
   </div>
-  <div class="hero-sub">자작 세계관 · 캐릭터 · 이야기들</div>
-  <div class="hero-divider">
-    <div class="hero-divider-line"></div>
-    <div class="hero-divider-dot"></div>
-    <div class="hero-divider-line"></div>
+
+  <!-- RIGHT -->
+  <div class="right-panel">
+    <div class="content-area">
+
+      <!-- MAIN -->
+      <div class="content-block active" id="page-main">
+        <div class="main-eyebrow">welcome to my space</div>
+        <div class="main-heading">hello,<br><span>world.</span></div>
+        <div class="main-divider">
+          <div class="main-divider-line"></div>
+          <div class="main-divider-diamond"></div>
+          <div class="main-divider-line"></div>
+        </div>
+        <div class="main-desc">
+          다솜의 개인 공간입니다.<br>
+          자작 세계관, 캐릭터, TRPG, 일기, 그리고 좋아하는 것들을 모아두는 곳.<br><br>
+          천천히 둘러봐 주세요.
+        </div>
+      </div>
+
+      <!-- NOTICE -->
+      <div class="content-block" id="page-notice">
+        <div class="page-heading">Notice</div>
+        <div class="page-sub">공지사항</div>
+        <div id="notice-content"><div class="page-coming">— 공지사항이 없습니다 —</div></div>
+      </div>
+
+      <!-- DIARY -->
+      <div class="content-block" id="page-diary">
+        <div class="page-heading">Diary</div>
+        <div class="page-sub">일기</div>
+        <div class="page-coming">— 준비 중입니다 —</div>
+      </div>
+
+      <!-- GALLERY -->
+      <div class="content-block" id="page-gallery">
+        <div class="page-heading">Gallery</div>
+        <div class="page-sub">갤러리</div>
+        <div class="page-coming">— 준비 중입니다 —</div>
+      </div>
+
+      <!-- TRPG -->
+      <div class="content-block" id="page-trpg">
+        <div class="page-heading">TRPG</div>
+        <div class="page-sub">플레이 기록 &amp; 캐릭터 시트</div>
+        <div class="world-cards">
+          <div class="world-card-item">
+            <div class="world-card-icon" style="font-size:20px;color:var(--pink-dim);">✦</div>
+            <div class="world-card-info">
+              <div class="world-card-name">박설 — 착호갑사</div>
+              <div class="world-card-sub">현재 진행 중인 캐릭터</div>
+            </div>
+            <div class="world-card-arrow">→</div>
+          </div>
+        </div>
+        <div class="page-coming" style="margin-top:1.5rem;">세션 기록 및 추가 정보는 준비 중입니다.</div>
+      </div>
+
+      <!-- UNIVERSE -->
+      <div class="content-block" id="page-universe">
+        <div class="page-heading">Universe</div>
+        <div class="page-sub">자작 세계관</div>
+        <div class="world-cards">
+          <a href="kisaragi.html" class="world-card-item">
+            <div class="world-card-icon">如</div>
+            <div class="world-card-info">
+              <div class="world-card-name">Kisaragi High School</div>
+              <div class="world-card-sub">如月高校 — Dark Fantasy · School</div>
+            </div>
+            <div class="world-card-arrow">→</div>
+          </a>
+          <div class="world-card-item" style="opacity:0.45;cursor:default;">
+            <div class="world-card-icon" style="font-size:20px;color:var(--text-muted);">+</div>
+            <div class="world-card-info">
+              <div class="world-card-name">Coming Soon</div>
+              <div class="world-card-sub">새 세계관 준비 중</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- GUEST -->
+      <div class="content-block" id="page-guest">
+        <div class="page-heading">Guest</div>
+        <div class="page-sub">방명록</div>
+        <div class="page-coming">— 준비 중입니다 —</div>
+      </div>
+
+      <!-- BANNER -->
+      <div class="content-block" id="page-banner">
+        <div class="page-heading">Banner</div>
+        <div class="page-sub">배너</div>
+        <div class="page-coming">— 준비 중입니다 —</div>
+      </div>
+
+    </div>
   </div>
 </div>
 
-<div class="worlds">
-
-  <a href="index.html" class="world-card kisaragi">
-    <div class="world-card-tag">Dark Fantasy · School</div>
-    <div class="world-card-icon">如</div>
-    <div class="world-card-title">Kisaragi High School</div>
-    <div class="world-card-title-sub">如月高校</div>
-    <div class="world-card-desc">
-      일본 어딘가의 엘리트 사립학교.<br>
-      입학을 축하드립니다.<br>
-      부디 건강히 졸업하시길.
-    </div>
-    <div class="world-card-arrow">→</div>
-  </a>
-
-  <a href="#" class="world-card yundan">
-    <div class="world-card-tag">Original · Comic</div>
-    <div class="world-card-icon">願</div>
-    <div class="world-card-title">윤단 × 네가이</div>
-    <div class="world-card-title-sub">Yundan &amp; 願</div>
-    <div class="world-card-desc">
-      건조한 말투와 조용한 존재감.<br>
-      말하지 않아도 곁에 있는 것.<br>
-      그런 관계에 대한 이야기.
-    </div>
-    <div class="world-card-arrow">→</div>
-  </a>
-
-  <div class="world-card add">
-    <div class="world-card-tag">Coming Soon</div>
-    <div class="world-card-icon" style="font-size:28px;">+</div>
-    <div class="world-card-title">새 세계관</div>
-    <div class="world-card-title-sub">준비 중</div>
-    <div class="world-card-desc">
-      언젠가 이곳에<br>
-      새로운 이야기가 채워질 예정.
-    </div>
+<!-- BGM -->
+<div id="bgm-player">
+  <button id="bgm-play-btn">▶</button>
+  <div id="bgm-info">
+    <div id="bgm-title">BGM</div>
+    <div id="bgm-artist"></div>
   </div>
-
+  <div id="bgm-vol-wrap"><input type="range" id="bgm-vol" min="0" max="100" value="70"></div>
+  <button id="bgm-toggle-collapse">✕</button>
+  <button id="bgm-expand-btn">♪</button>
 </div>
+<div id="yt-container" style="position:fixed;bottom:-9999px;left:-9999px;width:1px;height:1px;overflow:hidden;"></div>
 
-<footer>
-  © Dasom. All rights reserved. &nbsp;·&nbsp; 모든 세계관·캐릭터·스토리의 저작권은 작가에게 있습니다.
-</footer>
+<script>
+function getData(k,d){ try{return JSON.parse(localStorage.getItem('kisaragi_'+k))||d;}catch(e){return d;} }
 
+function showPage(name) {
+  document.querySelectorAll('.content-block').forEach(function(b){ b.classList.remove('active'); });
+  document.querySelectorAll('.nav-item').forEach(function(n){ n.classList.remove('active'); });
+  var block = document.getElementById('page-'+name);
+  if(block) block.classList.add('active');
+  event.currentTarget.classList.add('active');
+}
+
+function toggleSub(id) {
+  var sub = document.getElementById(id);
+  sub.classList.toggle('open');
+  event.currentTarget.classList.toggle('active');
+}
+
+// notice
+var notices = getData('notices',[]);
+if(notices.length) {
+  var html = '';
+  notices.forEach(function(n){
+    html += '<div style="padding:12px 0;border-bottom:1px solid var(--border);"><div style="font-size:13px;color:var(--text-dim);margin-bottom:4px;font-weight:500;">'+n.title+'</div><div style="font-size:11px;color:var(--text-muted);">'+n.date+'</div></div>';
+  });
+  document.getElementById('notice-content').innerHTML = html;
+}
+
+// BGM
+var ytPlayer=null, isPlaying=false;
+var bgmData = getData('bgm',{title:'BGM',artist:'',youtubeId:''});
+document.getElementById('bgm-title').textContent = bgmData.title||'BGM';
+document.getElementById('bgm-artist').textContent = bgmData.artist||'';
+window.onYouTubeIframeAPIReady = function(){
+  if(!bgmData.youtubeId) return;
+  ytPlayer = new YT.Player('yt-iframe',{height:'1',width:'1',videoId:bgmData.youtubeId,playerVars:{autoplay:0,loop:1,playlist:bgmData.youtubeId},events:{onReady:function(){}}});
+};
+function loadYT(){ if(!bgmData.youtubeId) return; document.getElementById('yt-container').innerHTML='<div id="yt-iframe"></div>'; var s=document.createElement('script'); s.src='https://www.youtube.com/iframe_api'; document.head.appendChild(s); }
+document.getElementById('bgm-play-btn').addEventListener('click',function(){ if(!bgmData.youtubeId) return; if(!ytPlayer){loadYT();isPlaying=true;this.textContent='⏸';return;} if(isPlaying){ytPlayer.pauseVideo();isPlaying=false;this.textContent='▶';}else{ytPlayer.playVideo();isPlaying=true;this.textContent='⏸';} });
+document.getElementById('bgm-vol').addEventListener('input',function(){ if(ytPlayer) ytPlayer.setVolume(this.value); });
+document.getElementById('bgm-toggle-collapse').addEventListener('click',function(){ document.getElementById('bgm-player').classList.add('collapsed'); });
+document.getElementById('bgm-expand-btn').addEventListener('click',function(){ document.getElementById('bgm-player').classList.remove('collapsed'); });
+
+// click sound
+var csData = getData('clicksound',{url:''});
+if(csData.url){ var cs=new Audio(csData.url); document.addEventListener('click',function(){ try{cs.currentTime=0;cs.play();}catch(e){} }); }
+</script>
 </body>
 </html>
