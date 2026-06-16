@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>dasom's world</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=IM+Fell+English:ital@0;1&family=Noto+Sans+KR:wght@400;500&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+:root {
+  --bg:#1a1018; --bg2:#241a22; --bg3:#2e2030;
+  --pink:#e5a9bf; --pink-light:#fdd6dd; --pink-dim:#a06080; --pink-dark:#6b3a52;
+  --text:#fdd6dd; --text-dim:#c9a0b4; --text-muted:#7a5568;
+  --border:rgba(229,169,191,0.18); --border-strong:rgba(229,169,191,0.38);
+}
+html,body { height:100%; }
+body { background:var(--bg); color:var(--text); font-family:'Noto Sans KR',sans-serif; font-weight:400; overflow:hidden; height:100vh; }
+.bg-layer { position:fixed; inset:0; z-index:0; background:radial-gradient(ellipse at 15% 50%,rgba(229,169,191,0.06) 0%,transparent 55%),radial-gradient(ellipse at 85% 30%,rgba(55,45,54,0.8) 0%,transparent 50%); }
+.bg-deco { position:fixed; z-index:0; pointer-events:none; user-select:none; font-family:'IM Fell English',serif; font-style:italic; color:rgba(229,169,191,0.03); }
+.bg-deco-1 { top:8%; left:3%; font-size:180px; line-height:1; }
+.bg-deco-2 { bottom:10%; right:3%; font-size:130px; line-height:1; }
+.layout { position:relative; z-index:1; display:grid; grid-template-columns:320px 1fr; height:100vh; }
+.left-panel { display:flex; flex-direction:column; justify-content:center; padding:3rem 2rem 3rem 3rem; border-right:1px solid var(--border); position:relative; overflow:hidden; }
+.left-panel::before { content:''; position:absolute; top:0; right:0; bottom:0; width:1px; background:linear-gradient(to bottom,transparent,var(--pink-dim),transparent); }
+.site-title-wrap { margin-bottom:2.5rem; }
+.site-title { font-family:'IM Fell English',serif; font-style:italic; font-size:38px; color:var(--text); line-height:1.1; letter-spacing:0.02em; }
+.site-title span { color:var(--pink); }
+.site-subtitle { font-size:10px; letter-spacing:0.3em; text-transform:uppercase; color:var(--text-muted); margin-top:0.5rem; }
+nav { display:flex; flex-direction:column; gap:2px; }
+.nav-item { position:relative; display:flex; flex-direction:column; cursor:pointer; padding:5px 0; text-decoration:none; }
+.nav-item-inner { display:flex; align-items:center; gap:0; width:100%; transition:transform 0.25s cubic-bezier(0.23,1,0.32,1); }
+.nav-item:hover .nav-item-inner { transform:translateX(8px); }
+.nav-item.active .nav-item-inner { transform:translateX(10px); }
+.nav-slash { font-family:'Cormorant Garamond',serif; font-style:italic; font-size:16px; color:var(--pink-dim); width:20px; flex-shrink:0; opacity:0; transition:opacity 0.2s; }
+.nav-item:hover .nav-slash, .nav-item.active .nav-slash { opacity:1; }
+.nav-label { font-family:'IM Fell English',serif; font-size:18px; color:var(--text-muted); letter-spacing:0.04em; transition:color 0.2s; line-height:1.3; }
+.nav-item:hover .nav-label { color:var(--text-dim); }
+.nav-item.active .nav-label { color:var(--pink-light); }
+.nav-line { position:absolute; left:-3rem; right:0; bottom:0; height:1px; background:linear-gradient(to right,transparent,var(--border)); }
+.nav-sub { display:none; flex-direction:column; gap:0; padding:4px 0 4px 36px; }
+.nav-sub.open { display:flex; }
+.nav-sub-item { font-family:'Cormorant Garamond',serif; font-style:italic; font-size:14px; color:var(--text-muted); padding:4px 0; cursor:pointer; text-decoration:none; display:flex; align-items:center; gap:8px; transition:color 0.2s,transform 0.2s; letter-spacing:0.06em; }
+.nav-sub-item::before { content:'·'; color:var(--pink-dim); }
+.nav-sub-item:hover { color:var(--pink); transform:translateX(4px); }
+.left-bottom { margin-top:auto; padding-top:1.5rem; font-size:10px; color:var(--text-muted); letter-spacing:0.08em; line-height:1.8; }
+
+/* AUTH AREA */
+.auth-area { display:flex; align-items:center; gap:8px; margin-bottom:1.5rem; }
+.auth-user-info { font-size:11px; color:var(--text-muted); letter-spacing:0.06em; flex:1; }
+.auth-user-info span { color:var(--pink); }
+.btn-auth { padding:4px 12px; background:transparent; border:1px solid var(--border); color:var(--text-muted); font-family:inherit; font-size:10px; letter-spacing:0.12em; text-transform:uppercase; cursor:pointer; transition:all 0.2s; }
+.btn-auth:hover { border-color:var(--pink-dim); color:var(--pink); }
+
+/* RIGHT */
+.right-panel { display:flex; flex-direction:column; align-items:center; justify-content:center; padding:3rem; position:relative; overflow:hidden; }
+.content-area { width:100%; max-width:620px; }
+.content-block { display:none; }
+.content-block.active { display:block; animation:fadeIn 0.4s ease; }
+@keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+
+.main-eyebrow { font-size:10px; letter-spacing:0.3em; text-transform:uppercase; color:var(--text-muted); margin-bottom:1.5rem; }
+.main-heading { font-family:'IM Fell English',serif; font-style:italic; font-size:52px; color:var(--text); line-height:1.1; margin-bottom:1rem; }
+.main-heading span { color:var(--pink); }
+.main-divider { display:flex; align-items:center; gap:12px; margin:1.5rem 0; }
+.main-divider-line { flex:1; height:1px; background:var(--border); }
+.main-divider-diamond { width:5px; height:5px; background:var(--pink-dim); transform:rotate(45deg); }
+.main-desc { font-size:12px; color:var(--text-muted); line-height:2; letter-spacing:0.04em; max-width:420px; }
+
+.page-heading { font-family:'IM Fell English',serif; font-style:italic; font-size:36px; color:var(--text); margin-bottom:0.5rem; }
+.page-sub { font-size:11px; letter-spacing:0.2em; text-transform:uppercase; color:var(--text-muted); margin-bottom:2rem; display:flex; align-items:center; gap:10px; }
+.page-sub::after { content:''; flex:1; height:1px; background:var(--border); }
+.page-coming { font-size:13px; color:var(--text-muted); letter-spacing:0.08em; font-family:'Cormorant Garamond',serif; font-style:italic; padding:2rem 0; }
+
+.world-cards { display:flex; flex-direction:column; gap:12px; margin-top:1.5rem; }
+.world-card-item { background:var(--bg2); border:1px solid var(--border); padding:1.25rem 1.5rem; display:flex; align-items:center; gap:1.5rem; cursor:pointer; transition:all 0.25s; text-decoration:none; }
+.world-card-item:hover { border-color:var(--border-strong); transform:translateX(6px); }
+.world-card-icon { font-family:'Noto Serif JP',serif; font-size:28px; color:rgba(192,57,43,0.5); width:40px; flex-shrink:0; text-align:center; }
+.world-card-info { flex:1; }
+.world-card-name { font-family:'IM Fell English',serif; font-size:16px; color:var(--text-dim); letter-spacing:0.04em; margin-bottom:3px; }
+.world-card-sub { font-size:11px; color:var(--text-muted); letter-spacing:0.06em; }
+.world-card-arrow { font-size:14px; color:var(--pink-dim); }
+
+/* NOTICE LIST */
+.notice-item { padding:12px 0; border-bottom:1px solid var(--border); }
+.notice-item:last-child { border-bottom:none; }
+.notice-item-title { font-size:13px; color:var(--text-dim); margin-bottom:4px; font-weight:500; }
+.notice-item-date { font-size:11px; color:var(--text-muted); }
+
+/* ADMIN PANEL */
+#page-admin { overflow-y:auto; max-height:calc(100vh - 6rem); }
+
+/* ADM TABS */
+.adm-tabs { display:flex; border-bottom:1px solid var(--border); margin-bottom:1.5rem; flex-wrap:wrap; gap:0; }
+.adm-tab { padding:8px 16px; font-size:10px; letter-spacing:0.18em; text-transform:uppercase; color:var(--text-muted); cursor:pointer; border-bottom:2px solid transparent; transition:all 0.2s; font-weight:500; }
+.adm-tab.active { color:var(--pink); border-bottom-color:var(--pink); }
+.adm-tab:hover { color:var(--text-dim); }
+.adm-panel { display:none; }
+.adm-panel.active { display:block; }
+.char-list-item { padding:9px 12px; background:var(--bg3); border:1px solid var(--border); cursor:pointer; transition:all 0.2s; margin-bottom:4px; }
+.char-list-item:hover, .char-list-item.selected { border-color:var(--pink-dim); }
+.char-list-item-name { font-size:12px; color:var(--text-dim); font-weight:500; }
+.char-list-item-role { font-size:10px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.08em; margin-top:1px; }
+.vn-line-row { display:flex; flex-direction:column; background:var(--bg3); border:1px solid var(--border); padding:10px; margin-bottom:8px; gap:6px; }
+
+.admin-section { background:var(--bg2); border:1px solid var(--border); padding:1.25rem; margin-bottom:1rem; }
+.admin-section-title { font-size:10px; letter-spacing:0.2em; text-transform:uppercase; color:var(--pink); margin-bottom:1rem; font-family:'Cormorant Garamond',serif; font-style:italic; }
+.form-group { margin-bottom:0.75rem; }
+.form-label { font-size:10px; letter-spacing:0.12em; text-transform:uppercase; color:var(--text-muted); margin-bottom:5px; display:block; }
+.form-input { width:100%; padding:8px 10px; background:var(--bg3); border:1px solid var(--border); color:var(--text); font-family:inherit; font-size:12px; outline:none; resize:vertical; }
+.form-input:focus { border-color:var(--pink-dim); }
+.form-row { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.btn-save { padding:7px 18px; background:rgba(160,96,128,0.2); border:1px solid var(--pink-dim); color:var(--pink); font-family:inherit; font-size:10px; letter-spacing:0.15em; text-transform:uppercase; cursor:pointer; transition:all 0.2s; }
+.btn-save:hover { background:rgba(160,96,128,0.35); }
+.btn-del { padding:5px 12px; background:transparent; border:1px solid rgba(139,26,26,0.4); color:rgba(192,57,43,0.7); font-family:inherit; font-size:10px; letter-spacing:0.1em; cursor:pointer; transition:all 0.2s; }
+.btn-del:hover { background:rgba(139,26,26,0.15); }
+.admin-item-row { display:flex; align-items:center; gap:10px; padding:8px 10px; background:var(--bg3); border:1px solid var(--border); margin-bottom:6px; }
+.admin-item-name { flex:1; font-size:12px; color:var(--text-dim); }
+.admin-item-sub { font-size:10px; color:var(--text-muted); margin-top:2px; }
+.save-msg { font-size:11px; color:var(--pink); margin-top:8px; display:none; }
+
+/* LOGIN MODAL */
+#auth-modal { display:none; position:fixed; inset:0; z-index:500; background:rgba(10,6,8,0.85); backdrop-filter:blur(8px); align-items:center; justify-content:center; }
+#auth-modal.active { display:flex; }
+.auth-box { background:var(--bg2); border:1px solid var(--border); padding:2.5rem; width:340px; }
+.auth-box-title { font-family:'IM Fell English',serif; font-style:italic; font-size:24px; color:var(--text); margin-bottom:0.4rem; }
+.auth-box-sub { font-size:10px; letter-spacing:0.2em; text-transform:uppercase; color:var(--text-muted); margin-bottom:2rem; }
+.auth-tabs { display:flex; gap:0; border-bottom:1px solid var(--border); margin-bottom:1.5rem; }
+.auth-tab { padding:8px 16px; font-size:11px; letter-spacing:0.15em; text-transform:uppercase; color:var(--text-muted); cursor:pointer; border-bottom:2px solid transparent; transition:all 0.2s; }
+.auth-tab.active { color:var(--pink); border-bottom-color:var(--pink); }
+.auth-form { display:none; }
+.auth-form.active { display:block; }
+.auth-input { width:100%; padding:10px 12px; background:var(--bg3); border:1px solid var(--border); color:var(--text); font-family:inherit; font-size:13px; outline:none; margin-bottom:10px; }
+.auth-input:focus { border-color:var(--pink-dim); }
+.auth-btn { width:100%; padding:10px; background:rgba(160,96,128,0.25); border:1px solid var(--pink-dim); color:var(--pink); font-family:inherit; font-size:11px; letter-spacing:0.2em; text-transform:uppercase; cursor:pointer; transition:all 0.2s; margin-top:4px; }
+.auth-btn:hover { background:rgba(160,96,128,0.4); }
+.auth-error { font-size:11px; color:rgba(192,57,43,0.8); margin-top:8px; display:none; }
+.auth-close { float:right; background:transparent; border:none; color:var(--text-muted); cursor:pointer; font-size:16px; margin-top:-0.5rem; }
+
+/* BGM */
+#bgm-player { position:fixed; bottom:1.5rem; right:1.5rem; z-index:999; background:rgba(26,16,24,0.96); border:1px solid var(--border); backdrop-filter:blur(12px); display:flex; align-items:center; gap:10px; padding:10px 14px; min-width:220px; max-width:300px; transition:all 0.3s; }
+#bgm-player.collapsed { min-width:0; max-width:none; width:44px; height:44px; padding:0; justify-content:center; }
+#bgm-player.collapsed #bgm-info,#bgm-player.collapsed #bgm-vol-wrap,#bgm-player.collapsed #bgm-toggle-collapse,#bgm-player.collapsed #bgm-play-btn { display:none; }
+#bgm-play-btn { width:28px; height:28px; flex-shrink:0; background:transparent; border:1px solid var(--pink-dim); color:var(--pink); cursor:pointer; font-size:11px; display:flex; align-items:center; justify-content:center; transition:all 0.2s; }
+#bgm-info { flex:1; min-width:0; }
+#bgm-title { font-size:10px; color:var(--text-dim); letter-spacing:0.06em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+#bgm-artist { font-size:9px; color:var(--text-muted); margin-top:2px; }
+#bgm-vol-wrap { display:flex; align-items:center; }
+#bgm-vol { width:55px; accent-color:var(--pink); cursor:pointer; }
+#bgm-toggle-collapse { background:transparent; border:none; color:var(--text-muted); cursor:pointer; font-size:11px; padding:2px 4px; flex-shrink:0; }
+#bgm-expand-btn { display:none; background:transparent; border:none; color:var(--pink); cursor:pointer; font-size:14px; width:100%; height:100%; align-items:center; justify-content:center; }
+#bgm-player.collapsed #bgm-expand-btn { display:flex; }
+</style>
+</head>
+<body>
+
+<div class="bg-layer"></div>
+<div class="bg-deco bg-deco-1">d</div>
+<div class="bg-deco bg-deco-2">世</div>
+
+<div class="layout">
+  <div class="left-panel">
+    <div class="site-title-wrap">
+      <div class="site-title">lake<span>house</span></div>
+      <div class="site-subtitle">archive &amp; stories</div>
+    </div>
+
+    <!-- AUTH AREA -->
+    <div class="auth-area" id="auth-area" style="display:flex;">
+      <div class="auth-user-info" id="auth-user-info">
+        <span>Guest</span>
+      </div>
+      <button class="btn-auth" id="auth-btn" onclick="openAuthModal()">Login</button>
+    </div>
+
+    <nav id="main-nav">
+      <div class="nav-item active" onclick="showPage('main',this)">
+        <div class="nav-item-inner"><span class="nav-slash">/</span><span class="nav-label">Main</span></div>
+        <div class="nav-line"></div>
+      </div>
+      <div class="nav-item" onclick="showPage('notice',this)">
+        <div class="nav-item-inner"><span class="nav-slash">/</span><span class="nav-label">Notice</span></div>
+        <div class="nav-line"></div>
+      </div>
+      <div class="nav-item" onclick="showPage('diary',this)">
+        <div class="nav-item-inner"><span class="nav-slash">/</span><span class="nav-label">Diary</span></div>
+        <div class="nav-line"></div>
+      </div>
+      <div class="nav-item" onclick="showPage('gallery',this)">
+        <div class="nav-item-inner"><span class="nav-slash">/</span><span class="nav-label">Gallery</span></div>
+        <div class="nav-line"></div>
+      </div>
+      <div class="nav-item" onclick="showPage('trpg',this)">
+        <div class="nav-item-inner"><span class="nav-slash">/</span><span class="nav-label">TRPG</span></div>
+        <div class="nav-line"></div>
+      </div>
+      <div class="nav-item" onclick="showPage('universe',this)">
+        <div class="nav-item-inner"><span class="nav-slash">/</span><span class="nav-label">Universe</span></div>
+        <div class="nav-line"></div>
+      </div>
+      <div class="nav-item" onclick="toggleSub('char-sub',this)">
+        <div class="nav-item-inner"><span class="nav-slash">/</span><span class="nav-label">Character</span></div>
+        <div class="nav-line"></div>
+      </div>
+      <div class="nav-sub" id="char-sub">
+        <a href="oc.html" class="nav-sub-item">OC</a>
+        <a href="pair.html" class="nav-sub-item">Pair</a>
+      </div>
+      <div class="nav-item" onclick="toggleSub('archive-sub',this)">
+        <div class="nav-item-inner"><span class="nav-slash">/</span><span class="nav-label">Archive</span></div>
+        <div class="nav-line"></div>
+      </div>
+      <div class="nav-sub" id="archive-sub">
+        <a href="#" class="nav-sub-item">Review</a>
+        <a href="#" class="nav-sub-item">Scrap</a>
+        <a href="#" class="nav-sub-item">Music</a>
+      </div>
+      <div class="nav-item" onclick="showPage('guest',this)">
+        <div class="nav-item-inner"><span class="nav-slash">/</span><span class="nav-label">Guest</span></div>
+        <div class="nav-line"></div>
+      </div>
+      <div class="nav-item" onclick="showPage('banner',this)">
+        <div class="nav-item-inner"><span class="nav-slash">/</span><span class="nav-label">Banner</span></div>
+        <div class="nav-line"></div>
+      </div>
+      <!-- ADMIN (로그인 후 표시) -->
+      <div class="nav-item" id="admin-nav-item" style="display:none;" onclick="showPage('admin',this)">
+        <div class="nav-item-inner"><span class="nav-slash">/</span><span class="nav-label" style="color:var(--pink-dim);font-size:15px;">Admin</span></div>
+        <div class="nav-line"></div>
+      </div>
+    </nav>
+
+    <div class="left-bottom">
+      © lakehouse. all rights reserved.
+    </div>
+  </div>
+
+  <div class="right-panel">
+    <div class="content-area">
+
+      <div class="content-block active" id="page-main">
+        <div class="main-eyebrow">welcome to my space</div>
+        <div class="main-heading" id="main-heading-text">lakehouse</div>
+        <div class="main-divider"><div class="main-divider-line"></div><div class="main-divider-diamond"></div><div class="main-divider-line"></div></div>
+        <div class="main-desc" id="main-desc-text">A lake in the mountains could help me reset</div>
+      </div>
+
+      <div class="content-block" id="page-notice">
+        <div class="page-heading">Notice</div>
+        <div class="page-sub">공지사항</div>
+        <div id="notice-list"><div class="page-coming">— 공지사항이 없습니다 —</div></div>
+      </div>
+
+      <div class="content-block" id="page-diary">
+        <div class="page-heading">Diary</div>
+        <div class="page-sub">일기</div>
+        <div class="page-coming" id="diary-content">— 준비 중입니다 —</div>
+      </div>
+
+      <div class="content-block" id="page-gallery">
+        <div class="page-heading">Gallery</div>
+        <div class="page-sub">갤러리</div>
+        <div class="page-coming">— 준비 중입니다 —</div>
+      </div>
+
+      <div class="content-block" id="page-trpg">
+        <div class="page-heading">TRPG</div>
+        <div class="page-sub">플레이 기록 &amp; 캐릭터 시트</div>
+        <div class="world-cards" id="trpg-cards">
+          <div class="world-card-item">
+            <div class="world-card-icon" style="font-size:20px;color:var(--pink-dim);">✦</div>
+            <div class="world-card-info">
+              <div class="world-card-name">박설 — 착호갑사</div>
+              <div class="world-card-sub">현재 진행 중인 캐릭터</div>
+            </div>
+            <div class="world-card-arrow">→</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="content-block" id="page-universe">
+        <div class="page-heading">Universe</div>
+        <div class="page-sub">자작 세계관</div>
+        <div class="world-cards" id="universe-cards">
+          <a href="kisaragi.html" class="world-card-item">
+            <div class="world-card-icon">如</div>
+            <div class="world-card-info">
+              <div class="world-card-name">Kisaragi High School</div>
+              <div class="world-card-sub">如月高校 — Dark Fantasy · School</div>
+            </div>
+            <div class="world-card-arrow">→</div>
+          </a>
+          <div class="world-card-item" style="opacity:0.45;cursor:default;">
+            <div class="world-card-icon" style="font-size:20px;color:var(--text-muted);">+</div>
+            <div class="world-card-info">
+              <div class="world-card-name">Coming Soon</div>
+              <div class="world-card-sub">새 세계관 준비 중</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="content-block" id="page-guest">
+        <div class="page-heading">Guest</div>
+        <div class="page-sub">방명록</div>
+        <div id="guest-list"><div class="page-coming">— 아직 방명록이 없습니다 —</div></div>
+        <div style="margin-top:1.5rem;" id="guest-form-wrap">
+          <div class="form-group"><label class="form-label">닉네임</label><input class="form-input auth-input" id="guest-name" placeholder="이름"></div>
+          <div class="form-group"><label class="form-label">메시지</label><textarea class="form-input auth-input" id="guest-msg" rows="3" placeholder="남기고 싶은 말을 적어주세요"></textarea></div>
+          <button class="btn-save" onclick="submitGuest()">남기기</button>
+        </div>
+      </div>
+
+      <div class="content-block" id="page-banner">
+        <div class="page-heading">Banner</div>
+        <div class="page-sub">배너</div>
+        <div id="banner-list"><div class="page-coming">— 준비 중입니다 —</div></div>
+      </div>
+
+      <!-- ADMIN PAGE -->
+      <div class="content-block" id="page-admin">
+        <div class="page-heading">Admin</div>
+        <div class="page-sub">관리자 설정</div>
+
+        <div class="adm-tabs">
+          <div class="adm-tab active" onclick="switchAdmTab('general',this)">General</div>
+          <div class="adm-tab" onclick="switchAdmTab('notice',this)">Notice</div>
+          <div class="adm-tab" onclick="switchAdmTab('kisaragi',this)">Kisaragi</div>
+          <div class="adm-tab" onclick="switchAdmTab('characters',this)">Characters</div>
+          <div class="adm-tab" onclick="switchAdmTab('chronicle',this)">Chronicle</div>
+          <div class="adm-tab" onclick="switchAdmTab('account',this)">Account</div>
+        </div>
+
+        <!-- GENERAL -->
+        <div class="adm-panel active" id="adm-panel-general">
+          <div class="admin-section">
+            <div class="admin-section-title">메인 텍스트</div>
+            <div class="form-group"><label class="form-label">제목 (span 태그로 핑크색)</label><input class="form-input" id="adm-main-title" placeholder="hello,&lt;br&gt;&lt;span&gt;world.&lt;/span&gt;"></div>
+            <div class="form-group"><label class="form-label">소개글</label><textarea class="form-input" id="adm-main-desc" rows="3"></textarea></div>
+            <button class="btn-save" onclick="saveMainText()">저장</button>
+            <div class="save-msg" id="msg-main">저장되었습니다.</div>
+          </div>
+          <div class="admin-section">
+            <div class="admin-section-title">외부 링크</div>
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">YouTube URL</label><input class="form-input" id="adm-yt-url" placeholder="https://youtube.com/..."></div>
+              <div class="form-group"><label class="form-label">Twitter/X URL</label><input class="form-input" id="adm-tw-url" placeholder="https://twitter.com/..."></div>
+            </div>
+            <button class="btn-save" onclick="saveLinks()">저장</button>
+            <div class="save-msg" id="msg-links">저장되었습니다.</div>
+          </div>
+          <div class="admin-section">
+            <div class="admin-section-title">BGM</div>
+            <div class="form-group"><label class="form-label">곡 제목</label><input class="form-input" id="adm-bgm-title" placeholder="곡 제목"></div>
+            <div class="form-group"><label class="form-label">아티스트</label><input class="form-input" id="adm-bgm-artist" placeholder="아티스트"></div>
+            <div class="form-group"><label class="form-label">유튜브 URL / ID</label><input class="form-input" id="adm-bgm-yt" placeholder="https://youtu.be/..."></div>
+            <button class="btn-save" onclick="saveBGM()">저장</button>
+            <div class="save-msg" id="msg-bgm">저장되었습니다.</div>
+          </div>
+          <div class="admin-section">
+            <div class="admin-section-title">클릭 사운드</div>
+            <div class="form-group"><label class="form-label">사운드 URL (MP3/WAV)</label><input class="form-input" id="adm-cs-url" placeholder="https://..."></div>
+            <div style="display:flex;gap:8px;margin-top:4px;">
+              <button class="btn-save" onclick="saveCS()">저장</button>
+              <button class="btn-del" onclick="removeCS()">제거</button>
+            </div>
+            <div class="save-msg" id="msg-cs">저장되었습니다.</div>
+          </div>
+        </div>
+
+        <!-- NOTICE -->
+        <div class="adm-panel" id="adm-panel-notice">
+          <div class="admin-section">
+            <div class="admin-section-title">새 공지 추가</div>
+            <div class="form-group"><label class="form-label">제목</label><input class="form-input" id="adm-ntc-title" placeholder="공지 제목"></div>
+            <div class="form-group"><label class="form-label">날짜</label><input class="form-input" id="adm-ntc-date" placeholder="2025.01.01"></div>
+            <div class="form-group"><label class="form-label">내용</label><textarea class="form-input" id="adm-ntc-content" rows="3" placeholder="내용"></textarea></div>
+            <button class="btn-save" onclick="addNotice()">추가</button>
+            <div class="save-msg" id="msg-ntc">추가되었습니다.</div>
+          </div>
+          <div class="admin-section">
+            <div class="admin-section-title">공지 목록</div>
+            <div id="adm-ntc-list"></div>
+          </div>
+        </div>
+
+        <!-- KISARAGI -->
+        <div class="adm-panel" id="adm-panel-kisaragi">
+          <div class="admin-section">
+            <div class="admin-section-title">키사라기 히어로 카피</div>
+            <div class="form-group"><label class="form-label">부제목 (eyebrow)</label><input class="form-input" id="adm-ks-eyebrow" placeholder="Kisaragi High School — Est. ????"></div>
+            <div class="form-group"><label class="form-label">메인 타이틀</label><input class="form-input" id="adm-ks-title" placeholder="如月高校"></div>
+            <div class="form-group"><label class="form-label">영문 서브타이틀</label><input class="form-input" id="adm-ks-subtitle" placeholder="Where the gifted are chosen..."></div>
+            <div class="form-group"><label class="form-label">소개 텍스트</label><textarea class="form-input" id="adm-ks-tagline" rows="2"></textarea></div>
+            <button class="btn-save" onclick="saveKisaragi()">저장</button>
+            <div class="save-msg" id="msg-ks">저장되었습니다.</div>
+          </div>
+          <div class="admin-section">
+            <div class="admin-section-title">키사라기 BGM (별도 설정 가능)</div>
+            <div class="form-group"><label class="form-label">곡 제목</label><input class="form-input" id="adm-ks-bgm-title" placeholder="곡 제목"></div>
+            <div class="form-group"><label class="form-label">아티스트</label><input class="form-input" id="adm-ks-bgm-artist" placeholder="아티스트"></div>
+            <div class="form-group"><label class="form-label">유튜브 URL / ID</label><input class="form-input" id="adm-ks-bgm-yt" placeholder="https://youtu.be/..."></div>
+            <button class="btn-save" onclick="saveKisaragiBGM()">저장</button>
+            <div class="save-msg" id="msg-ks-bgm">저장되었습니다.</div>
+          </div>
+          <div class="admin-section">
+            <div class="admin-section-title">About 텍스트</div>
+            <div class="form-group"><label class="form-label">소개글</label><textarea class="form-input" id="adm-ks-about" rows="3" placeholder="일본 어딘가에 위치한 엘리트 사립학교..."></textarea></div>
+            <button class="btn-save" onclick="saveKisaragiAbout()">저장</button>
+            <div class="save-msg" id="msg-ks-about">저장되었습니다.</div>
+          </div>
+        </div>
+
+        <!-- CHARACTERS -->
+        <div class="adm-panel" id="adm-panel-characters">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+            <div style="font-size:11px;color:var(--text-muted);letter-spacing:0.1em;">캐릭터를 선택하거나 새로 추가하세요.</div>
+            <button class="btn-save" onclick="newChar()">+ 새 캐릭터</button>
+          </div>
+          <div style="display:grid;grid-template-columns:180px 1fr;gap:1rem;">
+            <div id="adm-char-list-panel" style="display:flex;flex-direction:column;gap:6px;"></div>
+            <div id="adm-char-edit-panel" style="background:var(--bg2);border:1px solid var(--border);padding:1.25rem;">
+              <div style="font-size:12px;color:var(--text-muted);text-align:center;padding:2rem;">캐릭터를 선택하거나 새로 추가하세요.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CHRONICLE -->
+        <div class="adm-panel" id="adm-panel-chronicle">
+          <div class="admin-section">
+            <div class="admin-section-title">새 크로니클 추가</div>
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">번호</label><input class="form-input" id="adm-chr-num" placeholder="01"></div>
+              <div class="form-group"><label class="form-label">태그</label><input class="form-input" id="adm-chr-tag" placeholder="Prologue"></div>
+            </div>
+            <div class="form-group"><label class="form-label">내용</label><input class="form-input" id="adm-chr-text" placeholder="이야기 제목"></div>
+            <button class="btn-save" onclick="addChr()">추가</button>
+            <div class="save-msg" id="msg-chr">추가되었습니다.</div>
+          </div>
+          <div class="admin-section">
+            <div class="admin-section-title">크로니클 목록</div>
+            <div id="adm-chr-list"></div>
+          </div>
+        </div>
+
+        <!-- ACCOUNT -->
+        <div class="adm-panel" id="adm-panel-account">
+          <div class="admin-section">
+            <div class="admin-section-title">계정 설정</div>
+            <div style="font-size:11px;color:var(--text-muted);margin-bottom:1rem;" id="adm-email-display"></div>
+            <button class="btn-save" onclick="sendPasswordReset()">비밀번호 재설정 이메일 전송</button>
+            <div class="save-msg" id="msg-pw">이메일을 전송했습니다.</div>
+            <div style="margin-top:1rem;"><button class="btn-del" onclick="doLogout()">로그아웃</button></div>
+          </div>
+        </div>
+
+      </div>
+
+
+    </div>
+  </div>
+</div>
+
+<!-- AUTH MODAL -->
+<div id="auth-modal">
+  <div class="auth-box">
+    <button class="auth-close" onclick="closeAuthModal()">✕</button>
+    <div class="auth-box-title">dasom's world</div>
+    <div class="auth-box-sub">sign in to continue</div>
+    <div class="auth-tabs">
+      <div class="auth-tab active" onclick="switchAuthTab('login')">Login</div>
+      <div class="auth-tab" onclick="switchAuthTab('signup')">Sign Up</div>
+    </div>
+    <div class="auth-form active" id="form-login">
+      <input class="auth-input" id="login-email" type="email" placeholder="이메일">
+      <input class="auth-input" id="login-pw" type="password" placeholder="비밀번호">
+      <button class="auth-btn" onclick="doLogin()">로그인</button>
+      <div class="auth-error" id="login-error"></div>
+    </div>
+    <div class="auth-form" id="form-signup">
+      <input class="auth-input" id="signup-email" type="email" placeholder="이메일">
+      <input class="auth-input" id="signup-pw" type="password" placeholder="비밀번호 (6자 이상)">
+      <input class="auth-input" id="signup-nick" type="text" placeholder="닉네임">
+      <button class="auth-btn" onclick="doSignup()">회원가입</button>
+      <div class="auth-error" id="signup-error"></div>
+    </div>
+  </div>
+</div>
+
+<!-- BGM -->
+<div id="bgm-player">
+  <button id="bgm-play-btn">▶</button>
+  <div id="bgm-info"><div id="bgm-title">BGM</div><div id="bgm-artist"></div></div>
+  <div id="bgm-vol-wrap"><input type="range" id="bgm-vol" min="0" max="100" value="70"></div>
+  <button id="bgm-toggle-collapse">✕</button>
+  <button id="bgm-expand-btn">♪</button>
+</div>
+<div id="yt-container" style="position:fixed;bottom:-9999px;left:-9999px;width:1px;height:1px;overflow:hidden;"></div>
+
+<!-- FIREBASE -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getDatabase, ref, set, get, push, remove, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAdyaVA95hYEbPDfCRwNI0mretcowocGfM",
+  authDomain: "llikebread.firebaseapp.com",
+  databaseURL: "https://llikebread-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "llikebread",
+  storageBucket: "llikebread.firebasestorage.app",
+  messagingSenderId: "227317366345",
+  appId: "1:227317366345:web:472530c2616612899e0998"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getDatabase(app);
+
+const ADMIN_EMAIL = "gmssolove@naver.com"; // 관리자 이메일 — 나중에 바꿀 수 있음
+
+// AUTH STATE
+onAuthStateChanged(auth, function(user) {
+  if (user) {
+    document.getElementById('auth-user-info').innerHTML = '<span>' + (user.displayName || user.email.split('@')[0]) + '</span>';
+    document.getElementById('auth-btn').textContent = 'Logout';
+    document.getElementById('auth-btn').onclick = doLogout;
+    if (user.email === ADMIN_EMAIL) {
+      document.getElementById('admin-nav-item').style.display = 'block';
+    }
+    document.getElementById('adm-email-display').textContent = '현재 계정: ' + user.email;
+  } else {
+    document.getElementById('auth-user-info').innerHTML = '<span>Guest</span>';
+    document.getElementById('auth-btn').textContent = 'Login';
+    document.getElementById('auth-btn').onclick = openAuthModal;
+    document.getElementById('admin-nav-item').style.display = 'none';
+  }
+});
+
+// LOAD SITE DATA
+get(ref(db, 'site')).then(function(snap) {
+  if (!snap.exists()) return;
+  var d = snap.val();
+  if (d.mainTitle) document.getElementById('main-heading-text').innerHTML = d.mainTitle;
+  if (d.mainDesc) document.getElementById('main-desc-text').innerHTML = d.mainDesc;
+  if (d.bgm) {
+    document.getElementById('bgm-title').textContent = d.bgm.title || 'BGM';
+    document.getElementById('bgm-artist').textContent = d.bgm.artist || '';
+    window._bgmYtId = d.bgm.youtubeId || '';
+  }
+  if (d.clickSound) window._clickSoundUrl = d.clickSound;
+});
+
+// LOAD NOTICES
+onValue(ref(db, 'site/notices'), function(snap) {
+  var list = document.getElementById('notice-list');
+  if (!snap.exists()) { list.innerHTML = '<div class="page-coming">— 공지사항이 없습니다 —</div>'; return; }
+  var html = '';
+  var notices = snap.val();
+  Object.keys(notices).reverse().forEach(function(k) {
+    var n = notices[k];
+    html += '<div class="notice-item"><div class="notice-item-title">'+n.title+'</div><div class="notice-item-date">'+n.date+'</div></div>';
+  });
+  list.innerHTML = html;
+  renderAdminNotices(notices);
+});
+
+// LOAD GUEST
+onValue(ref(db, 'site/guest'), function(snap) {
+  var list = document.getElementById('guest-list');
+  if (!snap.exists()) { list.innerHTML = '<div class="page-coming">— 아직 방명록이 없습니다 —</div>'; return; }
+  var html = '';
+  var entries = snap.val();
+  Object.keys(entries).reverse().forEach(function(k) {
+    var g = entries[k];
+    html += '<div style="padding:12px 0;border-bottom:1px solid var(--border);"><div style="font-size:12px;color:var(--pink);margin-bottom:3px;">'+g.name+'</div><div style="font-size:12px;color:var(--text-muted);line-height:1.7;">'+g.msg+'</div></div>';
+  });
+  list.innerHTML = html;
+});
+
+// AUTH FUNCTIONS
+window.doLogin = function() {
+  var email = document.getElementById('login-email').value;
+  var pw = document.getElementById('login-pw').value;
+  var errEl = document.getElementById('login-error');
+  signInWithEmailAndPassword(auth, email, pw)
+    .then(function() { closeAuthModal(); })
+    .catch(function(e) { errEl.textContent = '이메일 또는 비밀번호가 올바르지 않습니다.'; errEl.style.display='block'; });
+};
+
+window.doSignup = function() {
+  var email = document.getElementById('signup-email').value;
+  var pw = document.getElementById('signup-pw').value;
+  var errEl = document.getElementById('signup-error');
+  createUserWithEmailAndPassword(auth, email, pw)
+    .then(function() { closeAuthModal(); })
+    .catch(function(e) {
+      var msg = e.code === 'auth/email-already-in-use' ? '이미 사용 중인 이메일입니다.' : e.code === 'auth/weak-password' ? '비밀번호는 6자 이상이어야 합니다.' : '회원가입 중 오류가 발생했습니다.';
+      errEl.textContent = msg; errEl.style.display='block';
+    });
+};
+
+window.doLogout = function() {
+  signOut(auth);
+  showPage('main', document.querySelector('.nav-item'));
+};
+
+window.sendPasswordReset = function() {
+  var user = auth.currentUser;
+  if (!user) return;
+  sendPasswordResetEmail(auth, user.email).then(function() {
+    showSaveMsg('msg-pw');
+  });
+};
+
+// ADMIN SAVE FUNCTIONS
+window.saveMainText = function() {
+  set(ref(db, 'site/mainTitle'), document.getElementById('adm-main-title').value);
+  set(ref(db, 'site/mainDesc'), document.getElementById('adm-main-desc').value);
+  document.getElementById('main-heading-text').innerHTML = document.getElementById('adm-main-title').value;
+  document.getElementById('main-desc-text').innerHTML = document.getElementById('adm-main-desc').value;
+  showSaveMsg('msg-main');
+};
+
+window.saveLinks = function() {
+  set(ref(db, 'site/links'), { youtube: document.getElementById('adm-yt-url').value, twitter: document.getElementById('adm-tw-url').value });
+  showSaveMsg('msg-links');
+};
+
+window.saveBGM = function() {
+  var ytRaw = document.getElementById('adm-bgm-yt').value.trim();
+  var m = ytRaw.match(/(?:youtu\.be\/|v=|embed\/)([A-Za-z0-9_-]{11})/);
+  var ytId = m ? m[1] : ytRaw;
+  var bgm = { title: document.getElementById('adm-bgm-title').value, artist: document.getElementById('adm-bgm-artist').value, youtubeId: ytId };
+  set(ref(db, 'site/bgm'), bgm);
+  document.getElementById('bgm-title').textContent = bgm.title || 'BGM';
+  document.getElementById('bgm-artist').textContent = bgm.artist || '';
+  window._bgmYtId = ytId;
+  showSaveMsg('msg-bgm');
+};
+
+window.saveCS = function() {
+  var url = document.getElementById('adm-cs-url').value.trim();
+  set(ref(db, 'site/clickSound'), url);
+  window._clickSoundUrl = url;
+  showSaveMsg('msg-cs');
+};
+
+window.removeCS = function() {
+  set(ref(db, 'site/clickSound'), '');
+  window._clickSoundUrl = '';
+  showSaveMsg('msg-cs');
+};
+
+window.addNotice = function() {
+  var title = document.getElementById('adm-ntc-title').value.trim();
+  if (!title) return;
+  push(ref(db, 'site/notices'), { title: title, date: document.getElementById('adm-ntc-date').value, content: document.getElementById('adm-ntc-content').value });
+  document.getElementById('adm-ntc-title').value = '';
+  document.getElementById('adm-ntc-date').value = '';
+  document.getElementById('adm-ntc-content').value = '';
+  showSaveMsg('msg-ntc');
+};
+
+window.deleteNotice = function(key) {
+  remove(ref(db, 'site/notices/' + key));
+};
+
+function renderAdminNotices(notices) {
+  var el = document.getElementById('adm-ntc-list');
+  if (!el) return;
+  var html = '';
+  Object.keys(notices).reverse().forEach(function(k) {
+    var n = notices[k];
+    html += '<div class="admin-item-row"><div class="admin-item-name">'+n.title+'<div class="admin-item-sub">'+n.date+'</div></div><button class="btn-del" onclick="deleteNotice(\''+k+'\')">삭제</button></div>';
+  });
+  el.innerHTML = html;
+}
+
+window.submitGuest = function() {
+  var name = document.getElementById('guest-name').value.trim();
+  var msg = document.getElementById('guest-msg').value.trim();
+  if (!name || !msg) return;
+  push(ref(db, 'site/guest'), { name: name, msg: msg, date: new Date().toLocaleDateString('ko-KR') });
+  document.getElementById('guest-name').value = '';
+  document.getElementById('guest-msg').value = '';
+};
+
+// LOAD ADMIN FORM VALUES
+get(ref(db, 'site')).then(function(snap) {
+  if (!snap.exists()) return;
+  var d = snap.val();
+  if (d.mainTitle) document.getElementById('adm-main-title').value = d.mainTitle;
+  if (d.mainDesc) document.getElementById('adm-main-desc').value = d.mainDesc;
+  if (d.bgm) {
+    document.getElementById('adm-bgm-title').value = d.bgm.title || '';
+    document.getElementById('adm-bgm-artist').value = d.bgm.artist || '';
+    document.getElementById('adm-bgm-yt').value = d.bgm.youtubeId || '';
+  }
+  if (d.clickSound) document.getElementById('adm-cs-url').value = d.clickSound;
+  if (d.links) {
+    document.getElementById('adm-yt-url').value = d.links.youtube || '';
+    document.getElementById('adm-tw-url').value = d.links.twitter || '';
+  }
+});
+
+</script>
+
+<script>
+function switchAdmTab(name, el) {
+  document.querySelectorAll('.adm-tab').forEach(function(t){ t.classList.remove('active'); });
+  document.querySelectorAll('.adm-panel').forEach(function(p){ p.classList.remove('active'); });
+  if(el) el.classList.add('active');
+  var panel = document.getElementById('adm-panel-'+name);
+  if(panel) panel.classList.add('active');
+  if(name==='characters') renderAdmCharList();
+  if(name==='chronicle') renderAdmChrList();
+}
+
+// CHAR ADMIN
+var defaultChars=[
+  {id:1,nameJp:'遠藤 潤',nameRoman:'Endo Jun',role:'Antagonist',faction:'生徒会',stars:5,tag:'Uru',img:'',desc:'生徒会長。',profile:{학년:'3학년',나이:'18세'},story:'',gallery:[],novel:[],vnLines:[{speaker:'遠藤 潤',text:'......그래서, 네가 원하는 게 뭐야?'}]},
+  {id:2,nameJp:'遠藤 伊織',nameRoman:'Endo Iori',role:'Founder',faction:'창립자',stars:5,tag:'Iori',img:'',desc:'키사라기 고교의 창립자.',profile:{나이:'불명'},story:'',gallery:[],novel:[],vnLines:[{speaker:'遠藤 伊織',text:'이 학교는 내가 만든 게 아니야.'}]},
+  {id:3,nameJp:'遠藤 斗哉',nameRoman:'Endo Toya',role:'Protagonist',faction:'1학년',stars:4,tag:'Toya',img:'',desc:'전학생.',profile:{학년:'1학년',나이:'17세'},story:'',gallery:[],novel:[],vnLines:[{speaker:'遠藤 斗哉',text:'...여기, 뭔가 이상해.'}]}
+];
+var editingCharId = null;
+
+function getChars(){ try{return JSON.parse(localStorage.getItem('kisaragi_characters'))||defaultChars;}catch(e){return defaultChars;} }
+function setChars(v){ localStorage.setItem('kisaragi_characters',JSON.stringify(v)); }
+
+function renderAdmCharList(){
+  var chars = getChars();
+  var panel = document.getElementById('adm-char-list-panel');
+  if(!panel) return;
+  panel.innerHTML = '';
+  chars.forEach(function(c){
+    var d = document.createElement('div');
+    d.className = 'char-list-item' + (editingCharId===c.id?' selected':'');
+    d.innerHTML = '<div class="char-list-item-name">'+c.nameJp+'</div><div class="char-list-item-role">'+c.role+'</div>';
+    d.onclick = function(){ editChar(c.id); };
+    panel.appendChild(d);
+  });
+}
+
+function newChar(){
+  var chars = getChars();
+  var nc = {id:Date.now(),nameJp:'새 캐릭터',nameRoman:'',role:'',faction:'',stars:5,tag:'',img:'',desc:'',profile:{},story:'',gallery:[],novel:[],vnLines:[]};
+  chars.push(nc); setChars(chars);
+  renderAdmCharList(); editChar(nc.id);
+}
+
+function editChar(id){
+  editingCharId = id;
+  renderAdmCharList();
+  var chars = getChars();
+  var c = chars.find(function(x){ return x.id===id; });
+  if(!c) return;
+  var panel = document.getElementById('adm-char-edit-panel');
+  panel.innerHTML = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;"><div style="font-size:13px;color:var(--pink);font-family:Cormorant Garamond,serif;font-style:italic;">캐릭터 편집</div><div style="display:flex;gap:6px;"><button class="btn-save" onclick="saveChar('+id+')">저장</button><button class="btn-del" onclick="deleteChar('+id+')">삭제</button></div></div>'
+  + '<div class="form-row"><div class="form-group"><label class="form-label">이름 (한자)</label><input class="form-input" id="ce-namejp" value="'+c.nameJp+'"></div><div class="form-group"><label class="form-label">로마자</label><input class="form-input" id="ce-roman" value="'+(c.nameRoman||'')+'"></div></div>'
+  + '<div class="form-row"><div class="form-group"><label class="form-label">역할</label><input class="form-input" id="ce-role" value="'+c.role+'"></div><div class="form-group"><label class="form-label">소속</label><input class="form-input" id="ce-faction" value="'+(c.faction||'')+'"></div></div>'
+  + '<div class="form-row"><div class="form-group"><label class="form-label">태그</label><input class="form-input" id="ce-tag" value="'+(c.tag||'')+'"></div><div class="form-group"><label class="form-label">별점 (1~5)</label><input class="form-input" id="ce-stars" type="number" min="1" max="5" value="'+(c.stars||5)+'"></div></div>'
+  + '<div class="form-group"><label class="form-label">이미지 URL</label><input class="form-input" id="ce-img" value="'+(c.img||'')+'"></div>'
+  + '<div class="form-group"><label class="form-label">소개</label><textarea class="form-input" id="ce-desc" rows="2">'+(c.desc||'')+'</textarea></div>'
+  + '<div style="border-top:1px solid var(--border);margin:1rem 0;padding-top:1rem;"><div style="font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:var(--pink);margin-bottom:0.75rem;">서사</div><textarea class="form-input" id="ce-story" rows="4">'+(c.story||'')+'</textarea></div>'
+  + '<div style="border-top:1px solid var(--border);margin:1rem 0;padding-top:1rem;"><div style="font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:var(--pink);margin-bottom:0.75rem;">갤러리 URL (줄바꿈으로 구분)</div><textarea class="form-input" id="ce-gallery" rows="3">'+((c.gallery||[]).join("\n"))+'</textarea></div>'
+  + '<div style="border-top:1px solid var(--border);margin:1rem 0;padding-top:1rem;"><div style="font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:var(--pink);margin-bottom:0.75rem;">VN 대사 (이미지 클릭 시)</div><div id="ce-vn-lines"></div><button class="btn-save" onclick="addVNLine()" style="margin-top:6px;">+ 대사 추가</button></div>'
+  + '<div class="save-msg" id="char-save-msg">저장되었습니다.</div>';
+  renderVNLines(c.vnLines||[]);
+}
+
+function renderVNLines(lines){
+  var container = document.getElementById('ce-vn-lines');
+  if(!container) return;
+  container.innerHTML = '';
+  lines.forEach(function(l){ addVNLineWithVal(l.speaker||'',l.text||''); });
+}
+function addVNLine(){ addVNLineWithVal('',''); }
+function addVNLineWithVal(sp,tx){
+  var container = document.getElementById('ce-vn-lines');
+  var row = document.createElement('div');
+  row.className = 'vn-line-row';
+  row.innerHTML = '<input class="form-input vn-speaker" placeholder="화자" value="'+sp+'"><textarea class="form-input vn-text" rows="2" placeholder="대사">'+tx+'</textarea><button class="btn-del" onclick="this.parentNode.remove()" style="align-self:flex-start;margin-top:4px;">삭제</button>';
+  container.appendChild(row);
+}
+
+function saveChar(id){
+  var chars = getChars();
+  var idx = chars.findIndex(function(c){ return c.id===id; });
+  if(idx<0) return;
+  var galleryRaw = document.getElementById('ce-gallery').value.trim();
+  var gallery = galleryRaw ? galleryRaw.split('\n').map(function(s){return s.trim();}).filter(Boolean) : [];
+  var vnLines = [];
+  document.querySelectorAll('.vn-speaker').forEach(function(s,i){
+    var t = document.querySelectorAll('.vn-text')[i];
+    if(t&&t.value.trim()) vnLines.push({speaker:s.value,text:t.value.trim()});
+  });
+  chars[idx] = {id:id,nameJp:document.getElementById('ce-namejp').value,nameRoman:document.getElementById('ce-roman').value,role:document.getElementById('ce-role').value,faction:document.getElementById('ce-faction').value,stars:parseInt(document.getElementById('ce-stars').value)||5,tag:document.getElementById('ce-tag').value,img:document.getElementById('ce-img').value.trim(),desc:document.getElementById('ce-desc').value,story:document.getElementById('ce-story').value,gallery:gallery,novel:chars[idx].novel||[],vnLines:vnLines,profile:chars[idx].profile||{}};
+  setChars(chars);
+  renderAdmCharList();
+  var msg = document.getElementById('char-save-msg');
+  if(msg){ msg.style.display='block'; setTimeout(function(){msg.style.display='none';},2000); }
+}
+
+function deleteChar(id){
+  if(!confirm('삭제할까요?')) return;
+  setChars(getChars().filter(function(c){ return c.id!==id; }));
+  editingCharId = null;
+  document.getElementById('adm-char-edit-panel').innerHTML = '<div style="font-size:12px;color:var(--text-muted);text-align:center;padding:2rem;">캐릭터를 선택하거나 새로 추가하세요.</div>';
+  renderAdmCharList();
+}
+
+// CHRONICLE ADMIN
+var defaultChr=[{id:1,num:'01',text:'입학. 그리고 첫 번째 실종.',tag:'Prologue'},{id:2,num:'02',text:'교칙 제 7조.',tag:'Act I'},{id:3,num:'03',text:'지하 도서관에서 발견된 것.',tag:'Act I'}];
+function getChr(){ try{return JSON.parse(localStorage.getItem('kisaragi_chronicle'))||defaultChr;}catch(e){return defaultChr;} }
+function setChr(v){ localStorage.setItem('kisaragi_chronicle',JSON.stringify(v)); }
+
+function addChr(){
+  var t = document.getElementById('adm-chr-text').value.trim(); if(!t) return;
+  var list = getChr();
+  list.push({id:Date.now(),num:document.getElementById('adm-chr-num').value||String(list.length+1).padStart(2,'0'),text:t,tag:document.getElementById('adm-chr-tag').value});
+  setChr(list);
+  ['adm-chr-num','adm-chr-text','adm-chr-tag'].forEach(function(id){ document.getElementById(id).value=''; });
+  renderAdmChrList(); showSaveMsg('msg-chr');
+}
+function deleteChr(id){ setChr(getChr().filter(function(c){ return c.id!==id; })); renderAdmChrList(); }
+function renderAdmChrList(){
+  var list = getChr();
+  var el = document.getElementById('adm-chr-list'); if(!el) return;
+  el.innerHTML = list.map(function(c){
+    return '<div class="admin-item-row"><div class="admin-item-name">'+c.num+'. '+c.text+'<div class="admin-item-sub">'+c.tag+'</div></div><button class="btn-del" onclick="deleteChr('+c.id+')">삭제</button></div>';
+  }).join('') || '<div style="font-size:12px;color:var(--text-muted);padding:8px;">항목 없음</div>';
+}
+
+// KISARAGI ADMIN SAVES
+window.saveKisaragi = function() {
+  var d = { eyebrow: document.getElementById('adm-ks-eyebrow').value, title: document.getElementById('adm-ks-title').value, subtitle: document.getElementById('adm-ks-subtitle').value, tagline: document.getElementById('adm-ks-tagline').value };
+  localStorage.setItem('kisaragi_hero', JSON.stringify(d));
+  showSaveMsg('msg-ks');
+};
+window.saveKisaragiBGM = function() {
+  var ytRaw = document.getElementById('adm-ks-bgm-yt').value.trim();
+  var m = ytRaw.match(/(?:youtu\.be\/|v=|embed\/)([A-Za-z0-9_-]{11})/);
+  var ytId = m ? m[1] : ytRaw;
+  localStorage.setItem('kisaragi_bgm', JSON.stringify({title:document.getElementById('adm-ks-bgm-title').value,artist:document.getElementById('adm-ks-bgm-artist').value,youtubeId:ytId}));
+  showSaveMsg('msg-ks-bgm');
+};
+window.saveKisaragiAbout = function() {
+  localStorage.setItem('kisaragi_about', document.getElementById('adm-ks-about').value);
+  showSaveMsg('msg-ks-about');
+};
+
+// load kisaragi admin form
+(function loadKsForm(){
+  try {
+    var h = JSON.parse(localStorage.getItem('kisaragi_hero')||'{}');
+    if(document.getElementById('adm-ks-eyebrow')) {
+      document.getElementById('adm-ks-eyebrow').value = h.eyebrow||'';
+      document.getElementById('adm-ks-title').value = h.title||'';
+      document.getElementById('adm-ks-subtitle').value = h.subtitle||'';
+      document.getElementById('adm-ks-tagline').value = h.tagline||'';
+    }
+    var b = JSON.parse(localStorage.getItem('kisaragi_bgm')||'{}');
+    if(document.getElementById('adm-ks-bgm-title')) {
+      document.getElementById('adm-ks-bgm-title').value = b.title||'';
+      document.getElementById('adm-ks-bgm-artist').value = b.artist||'';
+      document.getElementById('adm-ks-bgm-yt').value = b.youtubeId||'';
+    }
+    var a = localStorage.getItem('kisaragi_about')||'';
+    if(document.getElementById('adm-ks-about')) document.getElementById('adm-ks-about').value = a;
+  } catch(e){}
+})();
+
+function showPage(name, el) {
+  document.querySelectorAll('.content-block').forEach(function(b){ b.classList.remove('active'); });
+  document.querySelectorAll('.nav-item').forEach(function(n){ n.classList.remove('active'); });
+  var block = document.getElementById('page-'+name);
+  if (block) block.classList.add('active');
+  if (el) el.classList.add('active');
+}
+
+function toggleSub(id, el) {
+  document.getElementById(id).classList.toggle('open');
+  if (el) el.classList.toggle('active');
+}
+
+function openAuthModal() { document.getElementById('auth-modal').classList.add('active'); }
+function closeAuthModal() { document.getElementById('auth-modal').classList.remove('active'); }
+
+function switchAuthTab(tab) {
+  document.querySelectorAll('.auth-tab').forEach(function(t,i){ t.classList.toggle('active', ['login','signup'][i]===tab); });
+  document.querySelectorAll('.auth-form').forEach(function(f,i){ f.classList.toggle('active', ['login','signup'][i]===tab); });
+}
+
+function showSaveMsg(id) {
+  var el = document.getElementById(id);
+  if (!el) return;
+  el.style.display = 'block';
+  setTimeout(function(){ el.style.display='none'; }, 2000);
+}
+
+// BGM
+window._bgmYtId = '';
+window._clickSoundUrl = '';
+var ytPlayer = null, isPlaying = false;
+
+document.getElementById('bgm-play-btn').addEventListener('click', function() {
+  if (!window._bgmYtId) return;
+  if (!ytPlayer) {
+    document.getElementById('yt-container').innerHTML = '<div id="yt-iframe"></div>';
+    var s = document.createElement('script'); s.src = 'https://www.youtube.com/iframe_api'; document.head.appendChild(s);
+    window.onYouTubeIframeAPIReady = function() {
+      ytPlayer = new YT.Player('yt-iframe', { height:'1', width:'1', videoId:window._bgmYtId, playerVars:{autoplay:1,loop:1,playlist:window._bgmYtId}, events:{onReady:function(e){e.target.setVolume(document.getElementById('bgm-vol').value);}} });
+    };
+    isPlaying = true; this.textContent = '⏸'; return;
+  }
+  if (isPlaying) { ytPlayer.pauseVideo(); isPlaying=false; this.textContent='▶'; }
+  else { ytPlayer.playVideo(); isPlaying=true; this.textContent='⏸'; }
+});
+
+document.getElementById('bgm-vol').addEventListener('input', function() { if(ytPlayer) ytPlayer.setVolume(this.value); });
+document.getElementById('bgm-toggle-collapse').addEventListener('click', function() { document.getElementById('bgm-player').classList.add('collapsed'); });
+document.getElementById('bgm-expand-btn').addEventListener('click', function() { document.getElementById('bgm-player').classList.remove('collapsed'); });
+
+// click sound
+document.addEventListener('click', function() {
+  if (window._clickSoundUrl) { try { var cs=new Audio(window._clickSoundUrl); cs.volume=0.5; cs.play(); } catch(e){} }
+});
+
+document.getElementById('auth-modal').addEventListener('click', function(e) { if(e.target===this) closeAuthModal(); });
+document.addEventListener('keydown', function(e) { if(e.key==='Escape') closeAuthModal(); });
+document.querySelectorAll('.auth-input').forEach(function(inp) { inp.addEventListener('keydown', function(e) { if(e.key==='Enter') { if(document.getElementById('form-login').classList.contains('active')) window.doLogin(); else window.doSignup(); } }); });
+</script>
+</body>
+</html>
