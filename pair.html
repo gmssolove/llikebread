@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pair — lakehouse</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=IM+Fell+English:ital@0;1&family=Noto+Serif+JP:wght@400;500&family=Noto+Sans+KR:wght@400;500&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+:root {
+  --bg:#1a1018; --bg2:#241a22; --bg3:#2e2030;
+  --pink:#e5a9bf; --pink-light:#fdd6dd; --pink-dim:#a06080; --pink-dark:#6b3a52;
+  --text:#fdd6dd; --text-dim:#c9a0b4; --text-muted:#7a5568;
+  --border:rgba(229,169,191,0.18); --border-strong:rgba(229,169,191,0.4);
+}
+body { background:var(--bg); color:var(--text); font-family:'Noto Sans KR',sans-serif; font-weight:400; min-height:100vh; }
+
+nav { position:sticky; top:0; z-index:200; background:rgba(26,16,24,0.95); backdrop-filter:blur(12px); border-bottom:1px solid var(--border); padding:0 2rem; display:flex; align-items:center; height:52px; gap:1rem; }
+.nav-back { font-size:10px; letter-spacing:0.15em; text-transform:uppercase; color:var(--text-muted); text-decoration:none; transition:color 0.2s; }
+.nav-back:hover { color:var(--pink); }
+.nav-title { font-family:'IM Fell English',serif; font-style:italic; font-size:18px; color:var(--text); flex:1; }
+.nav-links { display:flex; list-style:none; }
+.nav-links li a { display:block; padding:0 1rem; height:52px; line-height:52px; font-size:10px; letter-spacing:0.16em; color:var(--text-muted); text-decoration:none; text-transform:uppercase; }
+.nav-links li.active a { color:var(--pink); border-bottom:2px solid var(--pink); }
+
+.main-content { padding:2.5rem 2rem; max-width:1100px; margin:0 auto; }
+.pair-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:24px; }
+
+/* PAIR CARD */
+.pair-card { cursor:pointer; transition:transform 0.25s; }
+.pair-card:hover { transform:translateY(-6px); }
+.pair-card-imgs { display:grid; grid-template-columns:1fr 1fr; gap:4px; height:340px; position:relative; overflow:hidden; border:1px solid var(--border); transition:border-color 0.25s; }
+.pair-card:hover .pair-card-imgs { border-color:var(--pink); }
+.pair-char-wrap { position:relative; overflow:hidden; background:var(--bg3); }
+.pair-char-img { width:100%; height:100%; object-fit:cover; object-position:top; transition:filter 0.35s,opacity 0.35s; }
+.pair-char-placeholder { width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-family:'IM Fell English',serif; font-style:italic; font-size:48px; color:rgba(229,169,191,0.07); transition:filter 0.35s; }
+.pair-char-hover { position:absolute; inset:0; background:rgba(26,16,24,0.7); display:flex; align-items:center; justify-content:center; opacity:0; transition:opacity 0.3s; flex-direction:column; gap:4px; }
+.pair-card:hover .pair-char-hover { opacity:1; }
+.pair-card:hover .pair-char-img { filter:blur(2px); opacity:0.35; }
+.pair-card:hover .pair-char-placeholder { filter:blur(2px); opacity:0.25; }
+.pair-char-hover-name { font-family:'IM Fell English',serif; font-style:italic; font-size:16px; color:var(--text); text-align:center; padding:0 6px; }
+.pair-char-hover-sub { font-size:9px; color:var(--pink-dim); letter-spacing:0.1em; text-transform:uppercase; }
+.pair-center-line { position:absolute; top:0; bottom:0; left:50%; transform:translateX(-50%); width:1px; background:var(--border); z-index:2; }
+.pair-center-symbol { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); z-index:3; background:var(--bg2); border:1px solid var(--border); width:28px; height:28px; display:flex; align-items:center; justify-content:center; font-family:'Cormorant Garamond',serif; font-style:italic; font-size:14px; color:var(--pink-dim); transition:all 0.25s; }
+.pair-card:hover .pair-center-symbol { border-color:var(--pink); color:var(--pink); }
+.pair-card-bottom { background:var(--bg2); border:1px solid var(--border); border-top:none; padding:14px 16px; transition:border-color 0.25s; }
+.pair-card:hover .pair-card-bottom { border-color:var(--pink); }
+.pair-card-names { font-family:'IM Fell English',serif; font-style:italic; font-size:17px; color:var(--text); margin-bottom:4px; }
+.pair-card-names span { color:var(--pink); margin:0 6px; }
+.pair-card-rel { font-size:10px; letter-spacing:0.14em; text-transform:uppercase; color:var(--text-muted); font-family:'Cormorant Garamond',serif; font-style:italic; }
+.pair-card-keywords { display:flex; flex-wrap:wrap; gap:4px; margin-top:8px; }
+.pair-card-keyword { padding:2px 8px; background:rgba(160,96,128,0.08); border:1px solid var(--border); font-size:9px; color:var(--text-muted); font-family:'Cormorant Garamond',serif; font-style:italic; }
+
+/* FULLSCREEN DETAIL */
+#detail-screen { display:none; position:fixed; inset:0; z-index:400; background:var(--bg); overflow-y:auto; }
+#detail-screen.active { display:block; }
+#detail-screen::-webkit-scrollbar { width:4px; }
+#detail-screen::-webkit-scrollbar-thumb { background:var(--pink-dark); }
+
+.detail-nav { position:sticky; top:0; z-index:10; background:rgba(26,16,24,0.97); backdrop-filter:blur(12px); border-bottom:1px solid var(--border); padding:0 2rem; display:flex; align-items:center; height:52px; gap:1rem; }
+.detail-back-btn { font-size:10px; letter-spacing:0.15em; text-transform:uppercase; color:var(--text-muted); background:transparent; border:none; cursor:pointer; transition:color 0.2s; font-family:inherit; }
+.detail-back-btn:hover { color:var(--pink); }
+.detail-nav-title { font-family:'IM Fell English',serif; font-style:italic; font-size:16px; color:var(--text-dim); flex:1; }
+.btn-edit { padding:5px 16px; background:transparent; border:1px solid var(--pink-dim); color:var(--pink-dim); font-family:inherit; font-size:10px; letter-spacing:0.15em; text-transform:uppercase; cursor:pointer; transition:all 0.2s; }
+.btn-edit:hover { background:rgba(160,96,128,0.15); color:var(--pink); }
+
+.detail-hero { height:420px; display:grid; grid-template-columns:1fr 1fr; position:relative; overflow:hidden; }
+.detail-hero-char { position:relative; overflow:hidden; }
+.detail-hero-char img { width:100%; height:100%; object-fit:cover; object-position:top; }
+.detail-hero-char-placeholder { width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-family:'IM Fell English',serif; font-style:italic; font-size:100px; color:rgba(229,169,191,0.05); background:var(--bg3); }
+.detail-hero-char-gradient { position:absolute; inset:0; background:linear-gradient(to top,rgba(26,16,24,1) 0%,transparent 40%); }
+.detail-hero-char-name { position:absolute; bottom:1rem; left:0; right:0; text-align:center; font-family:'IM Fell English',serif; font-style:italic; font-size:18px; color:var(--text); }
+.detail-hero-divider { position:absolute; top:0; bottom:0; left:50%; width:1px; background:var(--border); z-index:2; pointer-events:none; }
+.detail-hero-center { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); z-index:3; background:var(--bg); border:1px solid var(--border); width:36px; height:36px; display:flex; align-items:center; justify-content:center; font-family:'Cormorant Garamond',serif; font-style:italic; font-size:16px; color:var(--pink); }
+
+.detail-body { max-width:860px; margin:0 auto; padding:2.5rem 2rem; }
+.detail-pair-title { font-family:'IM Fell English',serif; font-style:italic; font-size:32px; color:var(--text); margin-bottom:6px; }
+.detail-pair-title span { color:var(--pink); }
+.detail-rel-badge { display:inline-block; padding:4px 14px; border:1px solid var(--pink-dark); font-size:10px; letter-spacing:0.15em; text-transform:uppercase; color:var(--pink-dim); font-family:'Cormorant Garamond',serif; font-style:italic; margin-bottom:2rem; }
+.detail-section-title { font-size:10px; letter-spacing:0.2em; text-transform:uppercase; color:var(--pink-dim); margin-bottom:0.75rem; margin-top:1.5rem; font-family:'Cormorant Garamond',serif; font-style:italic; display:flex; align-items:center; gap:10px; }
+.detail-section-title::after { content:''; flex:1; height:1px; background:var(--border); }
+.detail-desc { font-size:13px; color:var(--text-dim); line-height:1.9; }
+.detail-keywords { display:flex; flex-wrap:wrap; gap:8px; }
+.detail-keyword { padding:4px 14px; background:rgba(160,96,128,0.08); border:1px solid var(--border); font-size:11px; color:var(--text-muted); font-family:'Cormorant Garamond',serif; font-style:italic; }
+
+/* EDIT PANEL */
+#edit-panel { display:none; position:fixed; top:0; right:0; bottom:0; width:380px; z-index:600; background:var(--bg2); border-left:1px solid var(--border); overflow-y:auto; padding:1.5rem; box-shadow:-4px 0 20px rgba(0,0,0,0.4); }
+#edit-panel.active { display:block; }
+#edit-panel::-webkit-scrollbar { width:3px; }
+#edit-panel::-webkit-scrollbar-thumb { background:var(--pink-dark); }
+.edit-panel-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:1.5rem; }
+.edit-panel-title { font-family:'IM Fell English',serif; font-style:italic; font-size:18px; color:var(--pink-light); }
+.edit-close { background:transparent; border:1px solid var(--border); color:var(--text-muted); cursor:pointer; width:28px; height:28px; display:flex; align-items:center; justify-content:center; font-size:12px; transition:all 0.2s; }
+.edit-close:hover { border-color:var(--pink-dim); color:var(--pink); }
+.form-group { margin-bottom:0.9rem; }
+.form-label { font-size:10px; letter-spacing:0.12em; text-transform:uppercase; color:var(--text-muted); margin-bottom:5px; display:block; }
+.form-input { width:100%; padding:8px 10px; background:var(--bg3); border:1px solid var(--border); color:var(--text); font-family:inherit; font-size:12px; outline:none; resize:vertical; }
+.form-input:focus { border-color:var(--pink-dim); }
+.form-row { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.btn-save { padding:8px 20px; background:rgba(160,96,128,0.2); border:1px solid var(--pink-dim); color:var(--pink); font-family:inherit; font-size:10px; letter-spacing:0.15em; text-transform:uppercase; cursor:pointer; transition:all 0.2s; }
+.btn-save:hover { background:rgba(160,96,128,0.35); }
+.btn-del { padding:7px 14px; background:transparent; border:1px solid rgba(139,26,26,0.4); color:rgba(192,57,43,0.7); font-family:inherit; font-size:10px; letter-spacing:0.1em; cursor:pointer; transition:all 0.2s; }
+.section-sep { border-top:1px solid var(--border); margin:1.25rem 0; padding-top:1.25rem; }
+.section-sep-title { font-size:10px; letter-spacing:0.18em; text-transform:uppercase; color:var(--pink-dim); margin-bottom:0.75rem; font-family:'Cormorant Garamond',serif; font-style:italic; }
+.save-msg { font-size:11px; color:var(--pink); margin-top:8px; display:none; }
+
+/* IMAGE UPLOAD */
+.img-upload-wrap{display:flex;flex-direction:column;gap:6px;}
+.img-preview-pair{width:100%;aspect-ratio:2/3;background:var(--bg3);border:1px solid var(--border);overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--text-muted);}
+.img-preview-pair img{width:100%;height:100%;object-fit:cover;object-position:top;}
+.img-size-controls{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:4px;}
+.file-input-label{display:block;padding:8px;background:var(--bg3);border:1px solid var(--border);color:var(--text-muted);font-size:11px;letter-spacing:.1em;text-align:center;cursor:pointer;transition:all .2s;}
+.file-input-label:hover{border-color:var(--pink-dim);color:var(--pink);}
+input[type=file]{display:none;}
+
+/* BGM PLAYER */
+#bgm-player {
+  position:fixed; bottom:2rem; right:2rem; z-index:999;
+  background:rgba(26,16,24,0.97); border:1px solid var(--border);
+  border-radius:16px; backdrop-filter:blur(16px);
+  display:flex; align-items:center; gap:12px;
+  padding:14px 18px; min-width:260px; max-width:340px;
+  box-shadow:0 4px 24px rgba(0,0,0,0.4);
+  transition:min-width 0.3s, max-width 0.3s, padding 0.3s, border-radius 0.3s, width 0.3s, height 0.3s;
+  cursor:move; user-select:none; overflow:hidden;
+}
+#bgm-player.collapsed {
+  min-width:0; max-width:none;
+  width:52px; height:52px;
+  padding:0; border-radius:50%;
+  justify-content:flex-end;
+}
+#bgm-player.collapsed #bgm-info,
+#bgm-player.collapsed #bgm-vol-wrap,
+#bgm-player.collapsed #bgm-toggle-collapse,
+#bgm-player.collapsed #bgm-play-btn { display:none; }
+#bgm-play-btn {
+  width:34px; height:34px; flex-shrink:0;
+  background:transparent; border:1px solid var(--pink-dim); border-radius:50%;
+  color:var(--pink); cursor:pointer; font-size:12px;
+  display:flex; align-items:center; justify-content:center; transition:all 0.2s;
+}
+#bgm-play-btn:hover { background:rgba(160,96,128,0.2); }
+#bgm-info { flex:1; min-width:0; }
+#bgm-title { font-size:11px; color:var(--text-dim); letter-spacing:0.06em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+#bgm-artist { font-size:10px; color:var(--text-muted); margin-top:2px; }
+#bgm-vol-wrap { display:flex; align-items:center; }
+#bgm-vol { width:60px; accent-color:var(--pink); cursor:pointer; }
+#bgm-toggle-collapse {
+  background:transparent; border:none; color:var(--text-muted);
+  cursor:pointer; font-size:13px; padding:2px 4px; flex-shrink:0; transition:color 0.2s;
+}
+#bgm-toggle-collapse:hover { color:var(--pink); }
+#bgm-expand-btn {
+  display:none; background:transparent; border:none;
+  color:var(--pink); cursor:pointer; font-size:16px;
+  width:100%; height:100%; align-items:center; justify-content:center;
+}
+#bgm-player.collapsed #bgm-expand-btn { display:flex; }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-back">← back</a>
+  <div class="nav-title">Pair — Relationships</div>
+  <ul class="nav-links">
+    <li><a href="oc.html">OC</a></li>
+    <li class="active"><a href="pair.html">Pair</a></li>
+  </ul>
+</nav>
+
+<div class="main-content">
+  <div class="pair-grid" id="pair-grid"></div>
+</div>
+
+<!-- FULLSCREEN DETAIL -->
+<div id="detail-screen">
+  <div class="detail-nav">
+    <button class="detail-back-btn" onclick="closeDetail()">← 목록으로</button>
+    <div class="detail-nav-title" id="detail-nav-title">—</div>
+    <button class="btn-edit" id="btn-edit" style="display:none;" onclick="openEditPanel()">✎ 수정</button>
+  </div>
+  <div class="detail-hero" id="detail-hero"></div>
+  <div class="detail-body">
+    <div class="detail-pair-title" id="detail-names">— <span>&</span> —</div>
+    <div class="detail-rel-badge" id="detail-rel">—</div>
+    <div class="detail-section-title">About</div>
+    <div class="detail-desc" id="detail-desc">—</div>
+    <div class="detail-section-title">Keywords</div>
+    <div class="detail-keywords" id="detail-keywords"></div>
+    <div class="detail-section-title">Story</div>
+    <div class="detail-desc" id="detail-story" style="white-space:pre-wrap;">—</div>
+  </div>
+</div>
+
+<!-- EDIT PANEL -->
+<div id="edit-panel">
+  <div class="edit-panel-header">
+    <div class="edit-panel-title">페어 수정</div>
+    <button class="edit-close" onclick="closeEditPanel()">✕</button>
+  </div>
+  <div class="form-row">
+    <div class="form-group"><label class="form-label">캐릭터 1 이름</label><input class="form-input" id="ep-char1"></div>
+    <div class="form-group"><label class="form-label">서브명</label><input class="form-input" id="ep-char1sub"></div>
+  </div>
+  <div class="form-group">
+    <label class="form-label">캐릭터 1 이미지</label>
+    <div class="img-upload-wrap">
+      <div class="img-preview-pair" id="ep-img1-preview">이미지 없음</div>
+      <div class="img-size-controls">
+        <div class="form-group"><label class="form-label">Fit</label><select class="form-input" id="ep-img1-fit" onchange="updatePairPreview(1)"><option value="cover">Cover</option><option value="contain">Contain</option></select></div>
+        <div class="form-group"><label class="form-label">위치</label><select class="form-input" id="ep-img1-pos" onchange="updatePairPreview(1)"><option value="center top">위쪽</option><option value="center center">중앙</option><option value="center bottom">아래</option></select></div>
+      </div>
+      <label class="file-input-label">📁 파일 선택<input type="file" accept="image/*" onchange="handlePairImgUpload(this,1)"></label>
+      <input class="form-input" id="ep-img1" placeholder="또는 URL 직접 입력" oninput="updatePairPreview(1)">
+    </div>
+  </div>
+  <div class="form-row">
+    <div class="form-group"><label class="form-label">캐릭터 2 이름</label><input class="form-input" id="ep-char2"></div>
+    <div class="form-group"><label class="form-label">서브명</label><input class="form-input" id="ep-char2sub"></div>
+  </div>
+  <div class="form-group">
+    <label class="form-label">캐릭터 2 이미지</label>
+    <div class="img-upload-wrap">
+      <div class="img-preview-pair" id="ep-img2-preview">이미지 없음</div>
+      <div class="img-size-controls">
+        <div class="form-group"><label class="form-label">Fit</label><select class="form-input" id="ep-img2-fit" onchange="updatePairPreview(2)"><option value="cover">Cover</option><option value="contain">Contain</option></select></div>
+        <div class="form-group"><label class="form-label">위치</label><select class="form-input" id="ep-img2-pos" onchange="updatePairPreview(2)"><option value="center top">위쪽</option><option value="center center">중앙</option><option value="center bottom">아래</option></select></div>
+      </div>
+      <label class="file-input-label">📁 파일 선택<input type="file" accept="image/*" onchange="handlePairImgUpload(this,2)"></label>
+      <input class="form-input" id="ep-img2" placeholder="또는 URL 직접 입력" oninput="updatePairPreview(2)">
+    </div>
+  </div>
+  <div class="form-group"><label class="form-label">관계 태그 (예: Silent Bond)</label><input class="form-input" id="ep-relation"></div>
+  <div class="form-group"><label class="form-label">소개</label><textarea class="form-input" id="ep-desc" rows="3"></textarea></div>
+  <div class="form-group"><label class="form-label">키워드 (쉼표로 구분)</label><input class="form-input" id="ep-keywords" placeholder="침묵, 동행, 신뢰"></div>
+  <div class="form-group"><label class="form-label">스토리</label><textarea class="form-input" id="ep-story" rows="5"></textarea></div>
+  <div class="section-sep" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+    <button class="btn-save" onclick="savePair()">저장</button>
+    <button class="btn-del" onclick="deletePair()">삭제</button>
+    <div class="save-msg" id="ep-save-msg">저장되었습니다.</div>
+  </div>
+</div>
+
+<div id="bgm-player">
+  <button id="bgm-play-btn">▶</button>
+  <div id="bgm-info"><div id="bgm-title">BGM</div><div id="bgm-artist"></div></div>
+  <div id="bgm-vol-wrap"><input type="range" id="bgm-vol" min="0" max="100" value="70"></div>
+  <button id="bgm-toggle-collapse">✕</button>
+  <button id="bgm-expand-btn">♪</button>
+</div>
+<div id="yt-container" style="position:fixed;bottom:-9999px;left:-9999px;width:1px;height:1px;overflow:hidden;"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+const firebaseConfig = {
+  apiKey:"AIzaSyAdyaVA95hYEbPDfCRwNI0mretcowocGfM",
+  authDomain:"llikebread.firebaseapp.com",
+  databaseURL:"https://llikebread-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId:"llikebread",
+  storageBucket:"llikebread.firebasestorage.app",
+  messagingSenderId:"227317366345",
+  appId:"1:227317366345:web:472530c2616612899e0998"
+};
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const ADMIN_EMAIL = "gmssolove@naver.com";
+onAuthStateChanged(auth, function(user){
+  window._isAdmin = !!(user && user.email === ADMIN_EMAIL);
+  var btn = document.getElementById('btn-edit');
+  if(btn) btn.style.display = window._isAdmin ? 'block' : 'none';
+});
+</script>
+
+<script>
+window._isAdmin = false;
+var defaultPairs = [
+  {id:'yundan-negai',chars:['윤단','願'],charImgs:['',''],charSubs:['Yundan','Negai'],relation:'Silent Bond',desc:'말하지 않아도 곁에 있는 것.',keywords:['침묵','동행','신뢰'],story:'',color:'#e5a9bf'},
+  {id:'uru-toya',chars:['遠藤 潤','遠藤 斗哉'],charImgs:['',''],charSubs:['Uru','Toya'],relation:'Antagonist × Protagonist',desc:'키사라기 고교의 생도회장과 전학생.',keywords:['대립','비밀','학교'],story:'',color:'#c0392b'},
+  {id:'iori-toya',chars:['遠藤 伊織','遠藤 斗哉'],charImgs:['',''],charSubs:['Iori','Toya'],relation:'Founder × Descendant',desc:'창립자와 그 후계자.',keywords:['혈연','봉인','운명'],story:'',color:'#9a7d4a'}
+];
+
+function getPairs(){ try{return JSON.parse(localStorage.getItem('oc_pairs'))||defaultPairs;}catch(e){return defaultPairs;} }
+function setPairs(v){ localStorage.setItem('oc_pairs',JSON.stringify(v)); }
+
+var currentPair = null;
+
+function renderGrid(){
+  var pairs=getPairs(), grid=document.getElementById('pair-grid');
+  grid.innerHTML='';
+  pairs.forEach(function(p){
+    var card=document.createElement('div'); card.className='pair-card';
+    card.onclick=function(){openDetail(p);};
+    var charImgsHtml=p.chars.map(function(name,i){
+      var img=p.charImgs&&p.charImgs[i], sub=p.charSubs&&p.charSubs[i]||'';
+      var fit=p.charImgFit&&p.charImgFit[i]||'cover';var pos=p.charImgPos&&p.charImgPos[i]||'center top';
+    return '<div class="pair-char-wrap">'+(img?'<img class="pair-char-img" src="'+img+'" style="object-fit:'+fit+';object-position:'+pos+'" alt="'+name+'">':'<div class="pair-char-placeholder">'+name[0]+'</div>')+'<div class="pair-char-hover"><div class="pair-char-hover-name">'+name+'</div>'+(sub?'<div class="pair-char-hover-sub">'+sub+'</div>':'')+'</div></div>';
+    }).join('');
+    var kwHtml=(p.keywords||[]).slice(0,3).map(function(k){return'<div class="pair-card-keyword">'+k+'</div>';}).join('');
+    card.innerHTML='<div class="pair-card-imgs">'+charImgsHtml+'<div class="pair-center-line"></div><div class="pair-center-symbol">&</div></div>'
+      +'<div class="pair-card-bottom"><div class="pair-card-names">'+p.chars[0]+' <span>&</span> '+p.chars[1]+'</div><div class="pair-card-rel">'+p.relation+'</div><div class="pair-card-keywords">'+kwHtml+'</div></div>';
+    grid.appendChild(card);
+  });
+}
+
+function openDetail(p){
+  currentPair=p;
+  document.getElementById('detail-nav-title').textContent=p.chars[0]+' & '+p.chars[1];
+  document.getElementById('detail-names').innerHTML=p.chars[0]+' <span>&</span> '+p.chars[1];
+  document.getElementById('detail-rel').textContent=p.relation||'—';
+  document.getElementById('detail-desc').textContent=p.desc||'—';
+  document.getElementById('detail-story').textContent=p.story||'—';
+  document.getElementById('detail-keywords').innerHTML=(p.keywords||[]).map(function(k){return'<div class="detail-keyword">'+k+'</div>';}).join('');
+  var hero=document.getElementById('detail-hero');
+  hero.innerHTML=p.chars.map(function(name,i){
+    var img=p.charImgs&&p.charImgs[i];
+    return '<div class="detail-hero-char">'+(img?'<img src="'+img+'" alt="'+name+'">':'<div class="detail-hero-char-placeholder">'+name[0]+'</div>')+'<div class="detail-hero-char-gradient"></div><div class="detail-hero-char-name">'+name+'</div></div>';
+  }).join('')+'<div class="detail-hero-divider"></div><div class="detail-hero-center">&</div>';
+  document.getElementById('btn-edit').style.display=window._isAdmin?'block':'none';
+  document.getElementById('detail-screen').classList.add('active');
+  document.getElementById('detail-screen').scrollTop=0;
+}
+
+function closeDetail(){ document.getElementById('detail-screen').classList.remove('active'); closeEditPanel(); }
+
+function handlePairImgUpload(input, num){
+  var file=input.files[0]; if(!file) return;
+  var reader=new FileReader();
+  reader.onload=function(e){
+    document.getElementById('ep-img'+num).value=e.target.result;
+    updatePairPreview(num);
+  };
+  reader.readAsDataURL(file);
+}
+function updatePairPreview(num){
+  var src=document.getElementById('ep-img'+num).value.trim();
+  var fit=document.getElementById('ep-img'+num+'-fit').value;
+  var pos=document.getElementById('ep-img'+num+'-pos').value;
+  var preview=document.getElementById('ep-img'+num+'-preview');
+  if(src) preview.innerHTML='<img src="'+src+'" style="width:100%;height:100%;object-fit:'+fit+';object-position:'+pos+'" onerror="this.parentNode.textContent='불러올 수 없음'">';
+  else preview.innerHTML='이미지 없음';
+}
+function openEditPanel(){
+  if(!currentPair||!window._isAdmin) return;
+  var p=currentPair;
+  document.getElementById('ep-char1').value=p.chars[0]||'';
+  document.getElementById('ep-char1sub').value=p.charSubs&&p.charSubs[0]||'';
+  document.getElementById('ep-img1').value=p.charImgs&&p.charImgs[0]||'';
+  document.getElementById('ep-img1-fit').value=p.charImgFit&&p.charImgFit[0]||'cover';
+  document.getElementById('ep-img1-pos').value=p.charImgPos&&p.charImgPos[0]||'center top';
+  updatePairPreview(1);
+  document.getElementById('ep-char2').value=p.chars[1]||'';
+  document.getElementById('ep-char2sub').value=p.charSubs&&p.charSubs[1]||'';
+  document.getElementById('ep-img2').value=p.charImgs&&p.charImgs[1]||'';
+  document.getElementById('ep-img2-fit').value=p.charImgFit&&p.charImgFit[1]||'cover';
+  document.getElementById('ep-img2-pos').value=p.charImgPos&&p.charImgPos[1]||'center top';
+  updatePairPreview(2);
+  document.getElementById('ep-relation').value=p.relation||'';
+  document.getElementById('ep-desc').value=p.desc||'';
+  document.getElementById('ep-keywords').value=(p.keywords||[]).join(', ');
+  document.getElementById('ep-story').value=p.story||'';
+  document.getElementById('edit-panel').classList.add('active');
+}
+
+function closeEditPanel(){ document.getElementById('edit-panel').classList.remove('active'); }
+
+function savePair(){
+  if(!currentPair||!window._isAdmin) return;
+  var pairs=getPairs(), idx=pairs.findIndex(function(p){return p.id===currentPair.id;});
+  if(idx<0) return;
+  var kw=document.getElementById('ep-keywords').value.split(',').map(function(k){return k.trim();}).filter(Boolean);
+  pairs[idx]={
+    id:currentPair.id,
+    chars:[document.getElementById('ep-char1').value,document.getElementById('ep-char2').value],
+    charImgs:[document.getElementById('ep-img1').value.trim(),document.getElementById('ep-img2').value.trim()],
+    charImgFit:[document.getElementById('ep-img1-fit').value,document.getElementById('ep-img2-fit').value],
+    charImgPos:[document.getElementById('ep-img1-pos').value,document.getElementById('ep-img2-pos').value],
+    charSubs:[document.getElementById('ep-char1sub').value,document.getElementById('ep-char2sub').value],
+    relation:document.getElementById('ep-relation').value,
+    desc:document.getElementById('ep-desc').value,
+    keywords:kw,
+    story:document.getElementById('ep-story').value,
+    color:currentPair.color
+  };
+  setPairs(pairs); currentPair=pairs[idx];
+  openDetail(currentPair); renderGrid();
+  var msg=document.getElementById('ep-save-msg'); msg.style.display='block'; setTimeout(function(){msg.style.display='none';},2000);
+}
+
+function deletePair(){
+  if(!currentPair||!window._isAdmin||!confirm('삭제할까요?')) return;
+  setPairs(getPairs().filter(function(p){return p.id!==currentPair.id;}));
+  closeDetail(); renderGrid();
+}
+
+// BGM
+var bgmData=JSON.parse(localStorage.getItem('kisaragi_bgm')||'{"title":"BGM","artist":"","youtubeId":""}');
+document.getElementById('bgm-title').textContent=bgmData.title||'BGM';
+document.getElementById('bgm-artist').textContent=bgmData.artist||'';
+window._bgmYtId=bgmData.youtubeId||'';
+var ytPlayer=null,isPlaying=false;
+document.getElementById('bgm-play-btn').addEventListener('click',function(){
+  if(!window._bgmYtId)return;
+  if(!ytPlayer){document.getElementById('yt-container').innerHTML='<div id="yt-iframe"></div>';var s=document.createElement('script');s.src='https://www.youtube.com/iframe_api';document.head.appendChild(s);window.onYouTubeIframeAPIReady=function(){ytPlayer=new YT.Player('yt-iframe',{height:'1',width:'1',videoId:window._bgmYtId,playerVars:{autoplay:1,loop:1,playlist:window._bgmYtId},events:{onReady:function(e){e.target.setVolume(document.getElementById('bgm-vol').value);}}});};isPlaying=true;this.textContent='⏸';return;}
+  if(isPlaying){ytPlayer.pauseVideo();isPlaying=false;this.textContent='▶';}else{ytPlayer.playVideo();isPlaying=true;this.textContent='⏸';}
+});
+document.getElementById('bgm-vol').addEventListener('input',function(){if(ytPlayer)ytPlayer.setVolume(this.value);});
+document.getElementById('bgm-toggle-collapse').addEventListener('click',function(){document.getElementById('bgm-player').classList.add('collapsed');});
+document.getElementById('bgm-expand-btn').addEventListener('click',function(){document.getElementById('bgm-player').classList.remove('collapsed');});
+
+renderGrid();
+</script>
+</body>
+</html>
