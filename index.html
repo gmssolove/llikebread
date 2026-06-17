@@ -643,15 +643,12 @@ html,body{overflow:hidden!important;}
       <div class="content-block" id="page-guest">
         <div class="page-heading">Guest</div>
         <div class="page-sub">방명록</div>
-        <!-- 안내 박스: 맨 위, 크기 그대로 -->
-        <div style="font-size:11px;color:var(--text-muted);margin-bottom:1.5rem;padding:8px 12px;background:var(--bg2);border:1px solid var(--border);letter-spacing:0.06em;display:inline-block;" id="guest-login-notice">
-          방명록 작성은 로그인 후 가능합니다.
-        </div>
-
-        <!-- 방명록 목록 + 입력 폼: 동일 너비 컨테이너로 묶기 -->
-        <div style="display:flex;flex-direction:column;gap:1.25rem;max-width:520px;">
+        <div style="max-width:480px;display:flex;flex-direction:column;gap:1rem;">
           <div id="guest-list"><div class="page-coming">— 아직 방명록이 없습니다 —</div></div>
-          <div id="guest-form-inner" style="display:none;">
+          <div style="font-size:11px;color:var(--text-muted);padding:8px 12px;background:var(--bg2);border:1px solid var(--border);letter-spacing:0.06em;display:inline-block;" id="guest-login-notice">
+            방명록 작성은 로그인 후 가능합니다.
+          </div>
+          <div id="guest-form-inner" style="display:none;width:100%;">
             <div class="form-group"><label class="form-label">닉네임 <span style="color:var(--text-muted);font-size:10px;">(비우면 익명)</span></label><input class="form-input auth-input" id="guest-name" placeholder="닉네임 (비우면 익명)"></div>
             <div class="form-group"><label class="form-label">메시지</label><textarea class="form-input auth-input" id="guest-msg" rows="3" placeholder="남기고 싶은 말을 적어주세요"></textarea></div>
             <button class="btn-save" onclick="submitGuest()">남기기</button>
@@ -1156,20 +1153,13 @@ function switchAdmTab(name,el){
 function gd(k,d){try{return JSON.parse(localStorage.getItem(k))||d;}catch(e){return d;}}
 function sd(k,v){
   localStorage.setItem(k,JSON.stringify(v));
-  function doFbWrite(){
+  function _write(){
     if(window._db&&window._fbSet&&window._fbRef){
       try{window._fbSet(window._fbRef(window._db,'lhdata/'+k.replace(/[.#$\[\]]/g,'_')),v);}catch(e){}
     }
   }
-  if(window._db){doFbWrite();}
-  else{
-    var attempts=0;
-    var wait=setInterval(function(){
-      attempts++;
-      if(window._db){clearInterval(wait);doFbWrite();}
-      else if(attempts>50){clearInterval(wait);}
-    },100);
-  }
+  if(window._db){_write();}
+  else{var _a=0,_t=setInterval(function(){_a++;if(window._db){clearInterval(_t);_write();}else if(_a>50){clearInterval(_t);}},100);}
 }
 // Firebase에서 전체 데이터 로드 → localStorage 동기화
 window.syncFromFirebase=function(cb){
