@@ -645,7 +645,7 @@ html,body{overflow:hidden!important;}
         <div class="page-sub">방명록</div>
         <div style="max-width:480px;display:flex;flex-direction:column;gap:1rem;">
           <div id="guest-list"><div class="page-coming">— 아직 방명록이 없습니다 —</div></div>
-          <div style="font-size:11px;color:var(--text-muted);padding:8px 12px;background:var(--bg2);border:1px solid var(--border);letter-spacing:0.06em;display:inline-block;" id="guest-login-notice">
+          <div style="font-size:11px;color:var(--text-muted);padding:8px 12px;background:var(--bg2);border:1px solid var(--border);letter-spacing:0.06em;" id="guest-login-notice">
             방명록 작성은 로그인 후 가능합니다.
           </div>
           <div id="guest-form-inner" style="display:none;width:100%;">
@@ -1153,13 +1153,12 @@ function switchAdmTab(name,el){
 function gd(k,d){try{return JSON.parse(localStorage.getItem(k))||d;}catch(e){return d;}}
 function sd(k,v){
   localStorage.setItem(k,JSON.stringify(v));
-  function _write(){
-    if(window._db&&window._fbSet&&window._fbRef){
-      try{window._fbSet(window._fbRef(window._db,'lhdata/'+k.replace(/[.#$\[\]]/g,'_')),v);}catch(e){}
-    }
+  // Firebase에도 동시 저장 (동기화)
+  if(window._db&&window._fbSet&&window._fbRef){
+    try{
+      window._fbSet(window._fbRef(window._db,'lhdata/'+k.replace(/[.#$\[\]]/g,'_')),v);
+    }catch(e){}
   }
-  if(window._db){_write();}
-  else{var _a=0,_t=setInterval(function(){_a++;if(window._db){clearInterval(_t);_write();}else if(_a>50){clearInterval(_t);}},100);}
 }
 // Firebase에서 전체 데이터 로드 → localStorage 동기화
 window.syncFromFirebase=function(cb){

@@ -440,6 +440,7 @@ window._db=db;
 window._fbSet=set;
 window._fbRef=ref;
 window._fbGet=get;
+console.log('[Firebase] DB initialized:', db.app.options.databaseURL);
 onAuthStateChanged(auth,function(user){
   window._isAdmin=!!(user&&user.email==="gmssolove@naver.com");
   var btn=document.getElementById('btn-edit');
@@ -462,12 +463,14 @@ window.syncOCFromFirebase = function(cb) {
 };
 // 실시간 변경 감지 (다른 사람이 관리자로 수정하면 자동 반영)
 onValue(ref(db,'lhdata/oc_characters'), function(snap){
+  console.log('[Firebase] onValue oc_characters fired, exists:', snap.exists());
   if(snap.exists()){
-    console.log('[Firebase] oc_characters loaded:', snap.val());
-    localStorage.setItem('oc_characters', JSON.stringify(snap.val()));
+    var data = snap.val();
+    console.log('[Firebase] oc_characters data keys:', Array.isArray(data) ? data.length + ' items (array)' : Object.keys(data).length + ' items (object)');
+    localStorage.setItem('oc_characters', JSON.stringify(data));
     renderGrid();
   } else {
-    console.log('[Firebase] oc_characters: 데이터 없음');
+    console.log('[Firebase] oc_characters: Firebase에 데이터가 없습니다. lhdata/oc_characters 경로를 확인하세요.');
   }
 });
 onValue(ref(db,'lhdata/oc_categories'), function(snap){
@@ -490,13 +493,9 @@ var defaultCats=['세계관','TRPG'];
 function getChars(){try{return JSON.parse(localStorage.getItem('oc_characters'))||defaultOC;}catch(e){return defaultOC;}}
 function setChars(v){
   localStorage.setItem('oc_characters',JSON.stringify(v));
-  function _write(){
-    if(window._db&&window._fbSet&&window._fbRef){
-      try{window._fbSet(window._fbRef(window._db,'lhdata/oc_characters'),v);}catch(e){}
-    }
+  if(window._db&&window._fbSet&&window._fbRef){
+    try{window._fbSet(window._fbRef(window._db,'lhdata/oc_characters'),v);}catch(e){}
   }
-  if(window._db){_write();}
-  else{var _a=0,_t=setInterval(function(){_a++;if(window._db){clearInterval(_t);_write();}else if(_a>50){clearInterval(_t);}},100);}
 }
 function getCats(){try{return JSON.parse(localStorage.getItem('oc_categories'))||defaultCats;}catch(e){return defaultCats;}}
 

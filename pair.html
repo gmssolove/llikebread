@@ -269,13 +269,9 @@ var defaultPairs=[
 function getPairs(){try{return JSON.parse(localStorage.getItem('oc_pairs'))||defaultPairs;}catch(e){return defaultPairs;}}
 function setPairs(v){
   localStorage.setItem('oc_pairs',JSON.stringify(v));
-  function _write(){
-    if(window._db&&window._fbSet&&window._fbRef){
-      try{window._fbSet(window._fbRef(window._db,'lhdata/oc_pairs'),v);}catch(e){}
-    }
+  if(window._db&&window._fbSet&&window._fbRef){
+    try{window._fbSet(window._fbRef(window._db,'lhdata/oc_pairs'),v);}catch(e){}
   }
-  if(window._db){_write();}
-  else{var _a=0,_t=setInterval(function(){_a++;if(window._db){clearInterval(_t);_write();}else if(_a>50){clearInterval(_t);}},100);}
 }
 var currentPair=null;
 
