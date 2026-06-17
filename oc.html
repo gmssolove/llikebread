@@ -221,6 +221,68 @@ body{background:rgba(10,12,11,1)!important}body::before{content:"";position:fixe
 #bgm-player.collapsed #bgm-expand-btn{display:flex!important;position:absolute!important;inset:0!important;width:100%!important;height:100%!important;pointer-events:none!important;cursor:move!important;align-items:center!important;justify-content:center!important;}
 #bgm-player.collapsed:hover{transform:none!important;}
 </style>
+<style id="lakehouse-oc-rebuild-css">
+/* OC archive rebuild: denser game archive + centered character file. */
+body::before{background:linear-gradient(90deg,rgba(7,8,8,.82),rgba(10,12,11,.64)),url('갠홈/Gemini_Generated_Image_6qoxx16qoxx16qox.png') center/cover no-repeat!important;}
+.layout{display:grid!important;grid-template-columns:210px minmax(0,1fr)!important;width:min(1280px,calc(100vw - 30px))!important;height:calc(100vh - 74px)!important;background:rgba(8,10,10,.64)!important;backdrop-filter:blur(4px);}
+.sidebar{width:auto!important;padding:1.2rem .75rem!important;overflow:auto!important;}
+.sidebar-title{font-size:18px!important;color:var(--lake-copper-soft)!important;letter-spacing:.08em!important;}
+.filter-btn{min-height:42px!important;border-radius:0!important;justify-content:flex-start!important;gap:8px!important;}
+.main-content{position:relative!important;padding:1.45rem 1.6rem 2rem!important;overflow:auto!important;}
+.main-content::before{content:'CHARACTER ARCHIVE';position:sticky;top:0;display:block;margin:0 0 16px;padding:0 0 10px;color:rgba(240,207,173,.82);font:500 12px/1 'Cormorant Garamond',serif;letter-spacing:.26em;text-transform:uppercase;border-bottom:1px solid rgba(215,169,130,.24);z-index:2;background:linear-gradient(to bottom,rgba(8,10,10,.92),rgba(8,10,10,0));}
+.card-grid{grid-template-columns:repeat(auto-fill,minmax(128px,1fr))!important;gap:18px!important;align-items:start!important;}
+.char-card{aspect-ratio:3/4.55!important;border-radius:2px!important;background:linear-gradient(145deg,rgba(34,38,36,.92),rgba(12,14,14,.96))!important;border:1px solid rgba(215,169,130,.2)!important;box-shadow:0 16px 36px rgba(0,0,0,.34),inset 0 0 0 1px rgba(255,255,255,.025)!important;transform-origin:center bottom;animation:lhCardRise .58s cubic-bezier(.16,1,.3,1) both;}
+.char-card::before{content:'';position:absolute;inset:7px;border:1px solid rgba(215,169,130,.07);pointer-events:none;z-index:3;}
+.char-card::after{content:'✦';position:absolute;top:8px;left:9px;color:rgba(240,207,173,.82);font-size:13px;z-index:4;text-shadow:0 0 12px rgba(215,169,130,.3);}
+.char-card:hover{transform:translateY(-8px) scale(1.025)!important;border-color:rgba(240,207,173,.72)!important;box-shadow:0 24px 52px rgba(0,0,0,.46),0 0 22px rgba(215,169,130,.1)!important;}
+.char-card-img{object-fit:cover!important;object-position:center top!important;filter:saturate(.92) contrast(1.02);}
+.char-card-bottom{padding:32px 10px 10px!important;background:linear-gradient(to top,rgba(8,10,10,.98),rgba(8,10,10,.5) 62%,transparent)!important;}
+.char-card-stars{color:#e3bd72!important;font-size:9px!important;}
+.char-card-name{font-family:'Noto Serif KR','Cormorant Garamond',serif!important;font-size:13px!important;letter-spacing:.03em!important;}
+.char-card-role{font-size:9px!important;color:rgba(216,213,203,.52)!important;}
+.char-card-hover{background:rgba(8,10,10,.72)!important;backdrop-filter:blur(3px);}
+@keyframes lhCardRise{from{opacity:0;transform:translateY(22px) scale(.96);filter:blur(8px)}to{opacity:1;transform:none;filter:blur(0)}}
+#detail-screen{background:radial-gradient(circle at 50% 15%,rgba(215,169,130,.12),transparent 34%),linear-gradient(135deg,#0b0d0c,#171916 54%,#0b0d0c)!important;}
+#detail-screen.active{animation:lhDetailOpen .7s cubic-bezier(.16,1,.3,1) both!important;}
+@keyframes lhDetailOpen{from{opacity:0;filter:blur(10px);transform:scale(1.015)}to{opacity:1;filter:blur(0);transform:none}}
+.game-topbar{height:54px!important;background:rgba(8,10,10,.74)!important;border-bottom-color:rgba(215,169,130,.28)!important;}
+.game-body{position:relative!important;display:block!important;overflow:hidden!important;background:transparent!important;}
+.game-left{position:absolute!important;inset:0!important;background:radial-gradient(circle at 50% 30%,rgba(215,169,130,.14),transparent 38%),repeating-radial-gradient(circle at 50% 28%,rgba(215,169,130,.07) 0 1px,transparent 1px 9px)!important;}
+.game-left::before{content:'';position:absolute;inset:28px;border:1px solid rgba(215,169,130,.22);pointer-events:none;}
+.game-char-img{height:91%!important;max-width:46vw!important;z-index:4;filter:drop-shadow(0 28px 44px rgba(0,0,0,.55));cursor:pointer;}
+.game-char-img.animate-in{animation:lhCharacterReveal 1s cubic-bezier(.16,1,.3,1) both!important;}
+@keyframes lhCharacterReveal{0%{opacity:0;transform:translateX(-50%) translateY(26px) scale(.94);filter:blur(14px)}65%{opacity:1;filter:blur(0)}100%{opacity:1;transform:translateX(-50%) translateY(0) scale(1);filter:drop-shadow(0 28px 44px rgba(0,0,0,.55))}}
+.game-char-gradient{z-index:5;background:linear-gradient(90deg,rgba(8,10,10,.85),transparent 26%,transparent 74%,rgba(8,10,10,.86)),linear-gradient(0deg,rgba(8,10,10,.92),transparent 26%)!important;pointer-events:none;}
+.game-right{position:absolute!important;right:42px!important;top:84px!important;bottom:66px!important;width:330px!important;z-index:7;background:linear-gradient(180deg,rgba(15,17,16,.86),rgba(8,10,10,.72))!important;border:1px solid rgba(215,169,130,.26)!important;box-shadow:0 18px 48px rgba(0,0,0,.42)!important;backdrop-filter:blur(6px);}
+.game-file-header{padding:1rem 1.1rem .75rem!important;}
+.game-char-name{font-size:38px!important;color:rgba(244,238,229,.94)!important;}
+.lh-side-panel{position:absolute;z-index:7;width:300px;background:linear-gradient(180deg,rgba(16,18,16,.72),rgba(8,10,10,.52));border:1px solid rgba(215,169,130,.2);box-shadow:0 18px 46px rgba(0,0,0,.36);backdrop-filter:blur(5px);padding:18px;animation:lhSideIn .72s cubic-bezier(.16,1,.3,1) both;}
+.lh-side-left{left:48px;top:96px;max-height:calc(100vh - 170px);overflow:auto;}
+.lh-side-right{left:48px;bottom:66px;width:360px;}
+@keyframes lhSideIn{from{opacity:0;transform:translateX(-24px);filter:blur(10px)}to{opacity:1;transform:none;filter:blur(0)}}
+.lh-side-title{font:500 10px/1 'Cormorant Garamond',serif;letter-spacing:.24em;text-transform:uppercase;color:rgba(240,207,173,.78);margin-bottom:12px;display:flex;align-items:center;gap:10px;}
+.lh-side-title::after{content:'';height:1px;flex:1;background:rgba(215,169,130,.18);}
+.lh-chip-list{display:flex;flex-wrap:wrap;gap:6px;}
+.lh-chip{border:1px solid rgba(215,169,130,.25);background:rgba(215,169,130,.06);color:rgba(232,222,211,.76);padding:5px 9px;font-size:11px;}
+.lh-stat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;}
+.lh-stat{border:1px solid rgba(215,169,130,.18);padding:8px;background:rgba(0,0,0,.14);}
+.lh-stat b{display:block;color:rgba(240,207,173,.78);font-size:10px;letter-spacing:.12em;text-transform:uppercase;margin-bottom:4px;}
+.lh-stat span{color:rgba(232,222,211,.84);font-size:13px;}
+.au-buttons{right:calc(50% - 23vw)!important;bottom:34px!important;z-index:8!important;flex-direction:row!important;align-items:center!important;}
+.au-btn{min-width:74px!important;text-align:center!important;background:rgba(8,10,10,.76)!important;border-color:rgba(215,169,130,.28)!important;}
+.lh-vn-overlay{position:absolute;left:50%;bottom:32px;transform:translateX(-50%);width:min(760px,calc(100vw - 80px));z-index:20;display:none;}
+.lh-vn-overlay.active{display:block;animation:lhVNIn .36s cubic-bezier(.16,1,.3,1) both;}
+@keyframes lhVNIn{from{opacity:0;transform:translateX(-50%) translateY(20px);filter:blur(8px)}to{opacity:1;transform:translateX(-50%);filter:blur(0)}}
+.lh-vn-box{background:linear-gradient(180deg,rgba(12,14,13,.92),rgba(8,10,10,.86));border:1px solid rgba(215,169,130,.38);box-shadow:0 22px 60px rgba(0,0,0,.5);padding:18px 20px;position:relative;}
+.lh-vn-speaker{color:#f0cfad;font:500 18px/1 'Cormorant Garamond','Noto Serif KR',serif;margin-bottom:8px;}
+.lh-vn-text{color:rgba(244,238,229,.9);font-size:14px;line-height:1.85;min-height:48px;}
+.lh-vn-choices{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;}
+.lh-vn-choice{background:rgba(215,169,130,.08);border:1px solid rgba(215,169,130,.28);color:rgba(240,231,220,.86);padding:7px 12px;cursor:pointer;font:inherit;font-size:12px;}
+.lh-vn-choice:hover{border-color:rgba(240,207,173,.72);color:#f0cfad;}
+.lh-vn-close{position:absolute;right:10px;top:8px;background:transparent;border:0;color:rgba(240,207,173,.7);cursor:pointer;}
+.lh-edit-row{border:1px solid var(--border);background:var(--bg3);padding:8px;margin-bottom:8px;display:flex;flex-direction:column;gap:6px;}
+@media(max-width:900px){.layout{display:flex!important}.game-right,.lh-side-panel{position:relative!important;left:auto!important;right:auto!important;top:auto!important;bottom:auto!important;width:auto!important;margin:12px!important}.game-body{overflow:auto!important}.game-left{position:relative!important;min-height:72vh}.game-char-img{max-width:92vw!important}.au-buttons{right:16px!important;bottom:16px!important;flex-wrap:wrap!important}.lh-vn-overlay{width:calc(100vw - 24px);bottom:14px}.card-grid{grid-template-columns:repeat(auto-fill,minmax(118px,1fr))!important}}
+</style>
 </head>
 <body>
 
@@ -921,6 +983,38 @@ if(window.syncOCFromFirebase){
   function boot(n){if(pull())return;if(n<30)setTimeout(function(){boot(n+1)},250)}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',function(){boot(0)});else boot(0);
   window.addEventListener('pageshow',function(){boot(0)});
+})();
+</script>
+<script id="lakehouse-oc-rebuild-js">
+(function(){
+  function $(id){return document.getElementById(id)}
+  function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+  function arr(v){return Array.isArray(v)?v:[]}
+  function ensureStage(){
+    var left=$('game-left'); if(!left)return;
+    if(!$('lh-side-left'))left.insertAdjacentHTML('beforeend','<aside class="lh-side-panel lh-side-left" id="lh-side-left"></aside><aside class="lh-side-panel lh-side-right" id="lh-side-right"></aside><div class="lh-vn-overlay" id="lh-vn"><div class="lh-vn-box"><button class="lh-vn-close" onclick="closeDialogue()">×</button><div class="lh-vn-speaker" id="lh-vn-speaker"></div><div class="lh-vn-text" id="lh-vn-text"></div><div class="lh-vn-choices" id="lh-vn-choices"></div></div></div>');
+    var img=$('game-char-img'); if(img&&!img.dataset.lhTalk){img.dataset.lhTalk='1';img.addEventListener('click',function(){startDialogue()})}
+  }
+  function chips(title,items){items=arr(items).filter(Boolean);return items.length?'<div class="lh-side-title">'+title+'</div><div class="lh-chip-list">'+items.map(function(x){return'<span class="lh-chip">'+esc(x)+'</span>'}).join('')+'</div>':''}
+  function statsHtml(stats){stats=arr(stats).filter(function(x){return x&&x.k});return stats.length?'<div class="lh-side-title">TRPG Stats</div><div class="lh-stat-grid">'+stats.map(function(s){return'<div class="lh-stat"><b>'+esc(s.k)+'</b><span>'+esc(s.v)+'</span></div>'}).join('')+'</div>':''}
+  function renderExtra(c){ensureStage();var left=$('lh-side-left'),right=$('lh-side-right');if(!left||!right||!c)return;var profile=Array.isArray(c.profile)?c.profile:[];var essentials=profile.filter(function(p){return /^(나이|성별|신장|체중|체형|생일|혈액형|직업)$/i.test(p.k||'')});var rest=profile.filter(function(p){return !/^(나이|성별|신장|체중|체형|생일|혈액형|직업)$/i.test(p.k||'')});left.innerHTML='<div class="lh-side-title">Basic File</div><table class="game-profile-table">'+(essentials.length?essentials:profile.slice(0,8)).map(function(p){return'<tr><td>'+esc(p.k)+'</td><td>'+esc(p.v)+'</td></tr>'}).join('')+'</table>'+(rest.length?'<div class="lh-side-title" style="margin-top:16px">Notes</div><table class="game-profile-table">'+rest.map(function(p){return'<tr><td>'+esc(p.k)+'</td><td>'+esc(p.v)+'</td></tr>'}).join('')+'</table>':'')+statsHtml(c.stats);right.innerHTML=chips('Keywords',c.keywords)+chips('Like',c.likes)+chips('Hate',c.hates)+chips('Items',c.items)+(c.special?'<div class="lh-side-title" style="margin-top:14px">Special</div><div class="game-desc">'+esc(c.special)+'</div>':'')+(c.hobby?'<div class="lh-side-title" style="margin-top:14px">Hobby / Talent</div><div class="game-desc">'+esc(c.hobby)+'</div>':'');}
+  var oldOpen=window.openDetail;
+  window.openDetail=function(c,auIdx){oldOpen(c,auIdx);setTimeout(function(){renderExtra(c)},0)};
+  var dialogueIndex={};
+  function buildDialogue(c){dialogueIndex={};arr(c&&c.dialogue).forEach(function(n,i){dialogueIndex[n.id||String(i)]=n});return dialogueIndex;}
+  window.startDialogue=function(){if(!window.currentChar)return;var d=buildDialogue(window.currentChar);var first=window.currentChar.dialogueStart||Object.keys(d)[0];if(first)showDialogueNode(first);}
+  window.closeDialogue=function(){var v=$('lh-vn');if(v)v.classList.remove('active')}
+  window.showDialogueNode=function(id){ensureStage();var node=dialogueIndex[id]||buildDialogue(window.currentChar)[id];var box=$('lh-vn');if(!node||!box)return;var img=$('game-char-img');if(node.expression&&img){img.src=node.expression;img.classList.remove('animate-in');void img.offsetWidth;img.classList.add('animate-in')}box.classList.add('active');$('lh-vn-speaker').textContent=node.speaker||((window.currentChar&&window.currentChar.name)||'');$('lh-vn-text').textContent=node.text||'';var choices=arr(node.choices);$('lh-vn-choices').innerHTML=choices.length?choices.map(function(ch){return'<button class="lh-vn-choice" onclick="showDialogueNode(\''+esc(ch.next||'')+'\')">'+esc(ch.label||'...')+'</button>'}).join(''):'<button class="lh-vn-choice" onclick="closeDialogue()">닫기</button>';}
+  function installEditSections(){var panel=$('edit-panel');if(!panel||$('ep-extra-fields'))return;var anchor=$('ep-story');if(!anchor)return;anchor.closest('.section-sep').insertAdjacentHTML('afterend','<div class="section-sep" id="ep-extra-fields"><div class="section-sep-title">특이사항 / 키워드</div><div class="form-group"><label class="form-label">특이사항</label><textarea class="form-input" id="ep-special" rows="2"></textarea></div><div class="form-group"><label class="form-label">취미 / 특기</label><textarea class="form-input" id="ep-hobby" rows="2"></textarea></div><div class="form-group"><label class="form-label">키워드 (,로 구분)</label><input class="form-input" id="ep-keywords"></div><div class="form-row"><div class="form-group"><label class="form-label">Like</label><input class="form-input" id="ep-likes"></div><div class="form-group"><label class="form-label">Hate</label><input class="form-input" id="ep-hates"></div></div><div class="form-group"><label class="form-label">소지품</label><input class="form-input" id="ep-items"></div></div><div class="section-sep"><div class="section-sep-title">TRPG 스테이터스</div><div id="ep-stat-rows"></div><button class="btn-save" style="margin-top:6px;padding:5px 12px;" onclick="addStatRow()">+ 스탯 추가</button></div><div class="section-sep"><div class="section-sep-title">VN 분기 대화</div><div style="font-size:10px;color:var(--text-muted);line-height:1.6;margin-bottom:8px;">선택지는 한 줄에 하나씩: 답변|다음ID</div><div id="ep-dialogue-rows"></div><button class="btn-save" style="margin-top:6px;padding:5px 12px;" onclick="addDialogueRow()">+ 대화 노드 추가</button></div>');}
+  window.addStatRow=function(k,v){var box=$('ep-stat-rows');if(!box)return;var row=document.createElement('div');row.className='lh-edit-row';row.innerHTML='<div style="display:flex;gap:6px"><input class="form-input stat-key" placeholder="STR / DEX / SAN" value="'+esc(k||'')+'"><input class="form-input stat-val" placeholder="수치" value="'+esc(v||'')+'"><button class="btn-del" onclick="this.closest(\'.lh-edit-row\').remove()">삭제</button></div>';box.appendChild(row)}
+  window.addDialogueRow=function(n){n=n||{};var box=$('ep-dialogue-rows');if(!box)return;var choices=arr(n.choices).map(function(c){return (c.label||'')+'|'+(c.next||'')}).join('\n');var row=document.createElement('div');row.className='lh-edit-row';row.innerHTML='<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px"><input class="form-input dlg-id" placeholder="ID 예: start" value="'+esc(n.id||'')+'"><input class="form-input dlg-speaker" placeholder="화자" value="'+esc(n.speaker||'')+'"></div><textarea class="form-input dlg-text" rows="2" placeholder="대사">'+esc(n.text||'')+'</textarea><input class="form-input dlg-expression" placeholder="표정 이미지 URL 또는 파일 data" value="'+esc(n.expression||'')+'"><textarea class="form-input dlg-choices" rows="2" placeholder="응답|nextId">'+esc(choices)+'</textarea><button class="btn-del" onclick="this.closest(\'.lh-edit-row\').remove()" style="align-self:flex-start">삭제</button>';box.appendChild(row)}
+  function csv(id){var e=$(id);return e&&e.value?e.value.split(',').map(function(x){return x.trim()}).filter(Boolean):[]}
+  function fillEdit(c){installEditSections();if($('ep-special'))$('ep-special').value=c.special||'';if($('ep-hobby'))$('ep-hobby').value=c.hobby||'';if($('ep-keywords'))$('ep-keywords').value=arr(c.keywords).join(', ');if($('ep-likes'))$('ep-likes').value=arr(c.likes).join(', ');if($('ep-hates'))$('ep-hates').value=arr(c.hates).join(', ');if($('ep-items'))$('ep-items').value=arr(c.items).join(', ');if($('ep-stat-rows')){$('ep-stat-rows').innerHTML='';arr(c.stats).forEach(function(s){addStatRow(s.k,s.v)})}if($('ep-dialogue-rows')){$('ep-dialogue-rows').innerHTML='';arr(c.dialogue).forEach(function(n){addDialogueRow(n)})}}
+  var oldEdit=window.openEditPanel;
+  window.openEditPanel=function(){oldEdit();setTimeout(function(){if(window.currentChar)fillEdit(window.currentChar)},0)};
+  var oldSave=window.saveChar;
+  window.saveChar=function(){if(!window.currentChar||!window._isAdmin){return oldSave()}oldSave();var chars=getChars(),idx=chars.findIndex(function(c){return c.id===window.currentChar.id});if(idx<0)return;var stats=[];document.querySelectorAll('#ep-stat-rows .lh-edit-row').forEach(function(r){var k=r.querySelector('.stat-key').value.trim(),v=r.querySelector('.stat-val').value.trim();if(k)stats.push({k:k,v:v})});var dialogue=[];document.querySelectorAll('#ep-dialogue-rows .lh-edit-row').forEach(function(r,i){var id=r.querySelector('.dlg-id').value.trim()||String(i),text=r.querySelector('.dlg-text').value.trim();if(!text)return;var choices=r.querySelector('.dlg-choices').value.split('\n').map(function(line){var p=line.split('|');return{label:(p[0]||'').trim(),next:(p[1]||'').trim()}}).filter(function(c){return c.label});dialogue.push({id:id,speaker:r.querySelector('.dlg-speaker').value.trim(),text:text,expression:r.querySelector('.dlg-expression').value.trim(),choices:choices})});Object.assign(chars[idx],{special:($('ep-special')&&$('ep-special').value)||'',hobby:($('ep-hobby')&&$('ep-hobby').value)||'',keywords:csv('ep-keywords'),likes:csv('ep-likes'),hates:csv('ep-hates'),items:csv('ep-items'),stats:stats,dialogue:dialogue,dialogueStart:dialogue[0]&&dialogue[0].id});setChars(chars);window.currentChar=chars[idx];openDetail(window.currentChar,window.currentAuIdx);renderGrid();}
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',ensureStage);else ensureStage();
 })();
 </script>
 </body>
