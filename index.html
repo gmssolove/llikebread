@@ -1156,11 +1156,19 @@ function switchAdmTab(name,el){
 function gd(k,d){try{return JSON.parse(localStorage.getItem(k))||d;}catch(e){return d;}}
 function sd(k,v){
   localStorage.setItem(k,JSON.stringify(v));
-  // Firebase에도 동시 저장 (동기화)
-  if(window._db&&window._fbSet&&window._fbRef){
-    try{
-      window._fbSet(window._fbRef(window._db,'lhdata/'+k.replace(/[.#$\[\]]/g,'_')),v);
-    }catch(e){}
+  function doFbWrite(){
+    if(window._db&&window._fbSet&&window._fbRef){
+      try{window._fbSet(window._fbRef(window._db,'lhdata/'+k.replace(/[.#$\[\]]/g,'_')),v);}catch(e){}
+    }
+  }
+  if(window._db){doFbWrite();}
+  else{
+    var attempts=0;
+    var wait=setInterval(function(){
+      attempts++;
+      if(window._db){clearInterval(wait);doFbWrite();}
+      else if(attempts>50){clearInterval(wait);}
+    },100);
   }
 }
 // Firebase에서 전체 데이터 로드 → localStorage 동기화
