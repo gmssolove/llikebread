@@ -165,7 +165,7 @@ input[type=file]{display:none;}
 .game-char-stars{font-size:13px;color:var(--gold);letter-spacing:3px;margin-bottom:.5rem;animation:fadeSlideLeft .6s .15s cubic-bezier(.22,1,.36,1) both;}
 .game-char-name{font-family:'Playfair Display',serif;font-style:italic;font-size:clamp(26px,3vw,44px);color:var(--text);line-height:1;animation:fadeSlideLeft .7s .1s cubic-bezier(.22,1,.36,1) both;}
 .game-char-sub{font-size:12px;color:var(--gold-dim);letter-spacing:.1em;margin-top:.3rem;animation:fadeSlideLeft .6s .2s cubic-bezier(.22,1,.36,1) both;}
-.game-role-badge{display:inline-block;margin-top:.5rem;padding:3px 10px;border:1px solid var(--gold-dark);font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold-dim);animation:fadeSlideLeft .5s .25s cubic-bezier(.22,1,.36,1) both;}
+.game-role-badge{display:inline-block;margin-top:.5rem;padding:3px 10px;border:1px solid var(--gold-dark);font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold-dim);}
 .game-corner{position:absolute;width:18px;height:18px;border-color:rgba(196,154,108,.3);border-style:solid;}
 .game-corner-tl{top:10px;left:10px;border-width:1px 0 0 1px;}
 .game-corner-tr{top:10px;right:10px;border-width:1px 1px 0 0;}
@@ -189,8 +189,9 @@ input[type=file]{display:none;}
 .game-tabs{display:flex;border-bottom:1px solid var(--border);flex-shrink:0;animation:fadeUp .5s .15s cubic-bezier(.22,1,.36,1) both;}
 .game-tab{padding:8px 18px;font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--text-muted);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;}
 .game-tab.active,.game-tab:hover{color:var(--gold);border-bottom-color:var(--gold);}
-.game-tab-content{display:none;padding:1.25rem 1.5rem;flex:1;}
+.game-tab-content{display:none;padding:1.25rem 1.5rem;}
 .game-tab-content.active{display:block;animation:fadeUp .4s .1s cubic-bezier(.22,1,.36,1) both;}
+.game-char-name-block{margin-bottom:.35rem;}
 .game-info-block{margin-bottom:1.25rem;}
 .game-section-label{font-size:8px;letter-spacing:.24em;text-transform:uppercase;color:var(--gold-dim);margin-bottom:.6rem;font-family:'Cormorant Garamond',serif;font-style:italic;padding-bottom:.4rem;border-bottom:1px solid var(--border);}
 .game-profile-table{width:100%;border-collapse:collapse;}
@@ -361,11 +362,12 @@ html,body{height:100%!important;min-height:100%!important;overflow:hidden!import
       </div>
       <!-- AU BUTTONS -->
       <div class="au-buttons" id="au-buttons"></div>
+      <!-- NAME OVERLAY (display only) -->
       <div class="game-name-overlay">
-        <div class="game-char-stars" id="game-stars">★★★★★</div>
-        <div class="game-char-name" id="game-name">—</div>
-        <div class="game-char-sub" id="game-sub"></div>
-        <div class="game-role-badge" id="game-role">—</div>
+        <div class="game-char-stars" id="game-overlay-stars"></div>
+        <div class="game-char-name" id="game-overlay-name"></div>
+        <div class="game-char-sub" id="game-overlay-sub"></div>
+        <div class="game-role-badge" id="game-overlay-role"></div>
       </div>
     </div>
     <div class="game-right">
@@ -381,7 +383,14 @@ html,body{height:100%!important;min-height:100%!important;overflow:hidden!import
         <div class="game-tab" onclick="switchTab('novel',this)">Novel</div>
       </div>
       <div class="game-tab-content active" id="gtab-info">
-<div class="game-info-block" id="info-name-block" style="display:none;"></div>
+        <div class="game-info-block" id="info-name-block">
+          <div class="game-char-stars" id="game-stars">★★★★★</div>
+          <div class="game-char-name-block">
+            <div class="game-char-name" id="game-name">—</div>
+            <div class="game-char-sub" id="game-sub">—</div>
+          </div>
+          <div class="game-role-badge" id="game-role2" style="margin-bottom:1rem;">—</div>
+        </div>
         <div class="game-info-block" id="info-profile-block">
           <div class="game-section-label">기본 정보</div>
           <table class="game-profile-table" id="game-profile-table"></table>
@@ -662,6 +671,15 @@ function openDetail(c,auIdx){
   document.getElementById('game-role2').textContent=c.role||'—';
   document.getElementById('game-stars').textContent='★'.repeat(c.stars||5)+'☆'.repeat(5-(c.stars||5));
   document.getElementById('game-name').textContent=c.name;
+  // overlay 업데이트
+  var ovName=document.getElementById('game-overlay-name');
+  var ovSub=document.getElementById('game-overlay-sub');
+  var ovRole=document.getElementById('game-overlay-role');
+  var ovStars=document.getElementById('game-overlay-stars');
+  if(ovName)ovName.textContent=c.name;
+  if(ovSub)ovSub.textContent=c.nameSub||'';
+  if(ovRole)ovRole.textContent=c.role||'';
+  if(ovStars)ovStars.textContent='★'.repeat(c.stars||5)+'☆'.repeat(5-(c.stars||5));
   document.getElementById('game-sub').textContent=c.nameSub||'';
   var profile=Array.isArray(c.profile)?c.profile:Object.keys(c.profile||{}).map(function(k){return{k:k,v:c.profile[k]};});
   document.getElementById('game-profile-table').innerHTML=profile.map(function(p){return'<tr><td>'+p.k+'</td><td>'+p.v+'</td></tr>';}).join('')||'<tr><td colspan="2" style="color:var(--text-muted)">—</td></tr>';
