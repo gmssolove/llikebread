@@ -472,5 +472,21 @@ renderGrid();
   document.addEventListener('visibilitychange',function(){if(document.visibilityState==='hidden')remember()},{capture:true});
 })();
 </script>
+<script id="lakehouse-public-pair-sync-js">
+(function(){
+  function pull(){
+    if(!window._db||!window._fbGet||!window._fbRef)return false;
+    window._fbGet(window._fbRef(window._db,'lhdata/oc_pairs')).then(function(snap){
+      if(!snap||!snap.exists())return;
+      localStorage.setItem('oc_pairs',JSON.stringify(snap.val()));
+      if(typeof renderGrid==='function')renderGrid();
+    }).catch(function(e){console.warn('[lakehouse] public pair sync failed',e&&e.code?e.code:e)});
+    return true;
+  }
+  function boot(n){if(pull())return;if(n<30)setTimeout(function(){boot(n+1)},250)}
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',function(){boot(0)});else boot(0);
+  window.addEventListener('pageshow',function(){boot(0)});
+})();
+</script>
 </body>
 </html>

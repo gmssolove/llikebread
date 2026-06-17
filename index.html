@@ -415,6 +415,24 @@ html,body{overflow:hidden!important;}
 #page-guest #guest-login-notice,
 #page-guest #guest-form-inner{transform:none!important;width:100%!important;max-width:100%!important;box-sizing:border-box!important;margin-left:0!important;}
 </style>
+<style id="lakehouse-banner-trpg-fix-css">
+/* Banner manager + TRPG final sizing. */
+#adm-panel-banner .lh-banner-editor{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:start;}
+#adm-panel-banner .lh-banner-editor .form-group{margin-bottom:0;}
+#adm-panel-banner .lh-banner-editor .lh-full{grid-column:1/-1;}
+#adm-panel-banner .lh-banner-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:12px;}
+#adm-banner-preview{width:88px;height:31px;border:1px solid var(--border);background:var(--bg3);display:flex;align-items:center;justify-content:center;overflow:hidden;color:var(--text-muted);font-size:10px;}
+#adm-banner-preview img{width:100%;height:100%;object-fit:cover;display:block;}
+.lh-banner-row{display:grid;grid-template-columns:100px minmax(0,1fr) auto;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);}
+.lh-banner-thumb{width:88px;height:31px;border:1px solid var(--border);background:var(--bg3);display:flex;align-items:center;justify-content:center;overflow:hidden;font-size:10px;color:var(--text-muted);}
+.lh-banner-thumb img{width:100%;height:100%;object-fit:cover;display:block;}
+.lh-banner-row-actions{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end;}
+.lh-banner-mini{padding:4px 8px!important;font-size:10px!important;}
+#page-trpg #trpg-cards,#page-trpg > .world-card-item{width:100%!important;max-width:100%!important;box-sizing:border-box!important;}
+#page-trpg > .world-card-item{min-height:90px!important;margin:12px 0 0 0!important;padding:1rem 1.25rem!important;}
+#page-trpg #trpg-cards .page-coming,#page-trpg #trpg-cards .world-card-item{width:100%!important;max-width:100%!important;box-sizing:border-box!important;}
+@media(max-width:760px){#adm-panel-banner .lh-banner-editor{grid-template-columns:1fr}.lh-banner-row{grid-template-columns:1fr}.lh-banner-row-actions{justify-content:flex-start}}
+</style>
 </head>
 <body>
 
@@ -832,11 +850,16 @@ html,body{overflow:hidden!important;}
         <div class="adm-panel" id="adm-panel-banner">
           <div class="admin-section">
             <div class="admin-section-title">배너 관리</div>
-            <div class="form-group"><label class="form-label">배너 이름</label><input class="form-input" id="adm-banner-name" placeholder="사이트 이름"></div>
-            <div class="form-group"><label class="form-label">배너 URL (링크)</label><input class="form-input" id="adm-banner-url" placeholder="https://..."></div>
-            <div class="form-group"><label class="form-label">배너 이미지 URL</label><input class="form-input" id="adm-banner-img" placeholder="https://..."></div>
-            <button class="btn-save" onclick="addBannerItem()">추가</button>
-            <div class="save-msg" id="msg-banner">추가되었습니다.</div>
+            <input type="hidden" id="adm-banner-edit-id">
+            <input type="hidden" id="adm-banner-file-data">
+            <div class="lh-banner-editor">
+              <div class="form-group"><label class="form-label">배너 이름</label><input class="form-input" id="adm-banner-name" placeholder="사이트 이름"></div>
+              <div class="form-group"><label class="form-label">배너 URL (링크)</label><input class="form-input" id="adm-banner-url" placeholder="https://..."></div>
+              <div class="form-group lh-full"><label class="form-label">배너 이미지 URL</label><input class="form-input" id="adm-banner-img" placeholder="https://..."></div>
+              <div class="form-group lh-full"><label class="form-label">배너 이미지 파일</label><label class="file-input-label">이미지 파일 선택<input type="file" accept="image/*" onchange="handleBannerFileUpload(this)"></label><div id="adm-banner-file-name" style="font-size:11px;color:var(--text-muted);margin-top:4px;"></div></div>
+            </div>
+            <div class="lh-banner-actions"><button class="btn-save" id="adm-banner-save-btn" onclick="saveBannerItem()">추가</button><button class="btn-del" type="button" onclick="cancelBannerEdit()">취소</button><div id="adm-banner-preview">preview</div></div>
+            <div class="save-msg" id="msg-banner">저장되었습니다.</div>
             <div id="adm-banner-list" style="margin-top:1rem;"></div>
           </div>
         </div>
@@ -1789,6 +1812,28 @@ document.querySelectorAll('.auth-input').forEach(function(inp){inp.addEventListe
   window.addEventListener('pagehide',remember,{capture:true});
   window.addEventListener('beforeunload',remember,{capture:true});
   document.addEventListener('visibilitychange',function(){if(document.visibilityState==='hidden')remember()},{capture:true});
+})();
+</script>
+<script id="lakehouse-banner-manager-js">
+(function(){
+  function $(id){return document.getElementById(id)}
+  function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+  function list(){try{return getBanners()}catch(e){return []}}
+  function saveList(v){try{setBanners(v)}catch(e){}}
+  function clearForm(){['adm-banner-edit-id','adm-banner-name','adm-banner-url','adm-banner-img','adm-banner-file-data'].forEach(function(id){var el=$(id);if(el)el.value=''});if($('adm-banner-file-name'))$('adm-banner-file-name').textContent='';if($('adm-banner-save-btn'))$('adm-banner-save-btn').textContent='추가';updatePreview()}
+  function currentImg(){return (($('adm-banner-file-data')&&$('adm-banner-file-data').value)||($('adm-banner-img')&&$('adm-banner-img').value)||'').trim()}
+  function updatePreview(){var box=$('adm-banner-preview');if(!box)return;var img=currentImg();box.innerHTML=img?'<img src="'+esc(img)+'" alt="">':'preview'}
+  window.updateBannerPreview=updatePreview;
+  window.handleBannerFileUpload=function(input){var f=input.files&&input.files[0];if(!f)return;var r=new FileReader();r.onload=function(e){if($('adm-banner-file-data'))$('adm-banner-file-data').value=e.target.result;if($('adm-banner-file-name'))$('adm-banner-file-name').textContent=f.name;updatePreview()};r.readAsDataURL(f)};
+  window.cancelBannerEdit=clearForm;
+  window.saveBannerItem=function(){var name=($('adm-banner-name')&&$('adm-banner-name').value.trim())||'';if(!name)return;var id=($('adm-banner-edit-id')&&$('adm-banner-edit-id').value)||'';var items=list();var item={id:id||('b'+Date.now()),name:name,url:($('adm-banner-url')&&$('adm-banner-url').value.trim())||'',img:currentImg()};var idx=items.findIndex(function(x){return x.id===id});if(idx>=0)items[idx]=Object.assign({},items[idx],item);else items.push(item);saveList(items);clearForm();renderBannerList();if(typeof renderPublicBanner==='function')renderPublicBanner();if(typeof showSaveMsg==='function')showSaveMsg('msg-banner')};
+  window.addBannerItem=window.saveBannerItem;
+  window.editBannerItem=function(id){var b=list().find(function(x){return x.id===id});if(!b)return;if($('adm-banner-edit-id'))$('adm-banner-edit-id').value=b.id;if($('adm-banner-name'))$('adm-banner-name').value=b.name||'';if($('adm-banner-url'))$('adm-banner-url').value=b.url||'';if($('adm-banner-img'))$('adm-banner-img').value=(b.img&&b.img.indexOf('data:')!==0)?b.img:'';if($('adm-banner-file-data'))$('adm-banner-file-data').value=(b.img&&b.img.indexOf('data:')===0)?b.img:'';if($('adm-banner-file-name'))$('adm-banner-file-name').textContent=(b.img&&b.img.indexOf('data:')===0)?'저장된 파일 이미지':'';if($('adm-banner-save-btn'))$('adm-banner-save-btn').textContent='수정 저장';updatePreview();}
+  window.moveBannerItem=function(id,dir){var items=list(),i=items.findIndex(function(x){return x.id===id}),j=i+dir;if(i<0||j<0||j>=items.length)return;var t=items[i];items[i]=items[j];items[j]=t;saveList(items);renderBannerList();if(typeof renderPublicBanner==='function')renderPublicBanner()};
+  window.deleteBannerItem=function(id){saveList(list().filter(function(x){return x.id!==id}));renderBannerList();if(typeof renderPublicBanner==='function')renderPublicBanner();var edit=$('adm-banner-edit-id');if(edit&&edit.value===id)clearForm()};
+  window.renderBannerList=function(){var el=$('adm-banner-list');if(!el)return;var items=list();if(!items.length){el.innerHTML='<div style="font-size:12px;color:var(--text-muted);padding:8px;">배너가 없습니다.</div>';return}el.innerHTML=items.map(function(b,i){var img=b.img?'<img src="'+esc(b.img)+'" alt="">':esc(b.name||'banner');return '<div class="lh-banner-row"><div class="lh-banner-thumb">'+img+'</div><div class="admin-item-name">'+esc(b.name)+'<div style="font-size:10px;color:var(--text-muted);">'+esc(b.url||'링크없음')+'</div></div><div class="lh-banner-row-actions"><button class="btn-save lh-banner-mini" onclick="moveBannerItem(\''+esc(b.id)+'\',-1)" '+(i===0?'disabled':'')+'>위</button><button class="btn-save lh-banner-mini" onclick="moveBannerItem(\''+esc(b.id)+'\',1)" '+(i===items.length-1?'disabled':'')+'>아래</button><button class="btn-save lh-banner-mini" onclick="editBannerItem(\''+esc(b.id)+'\')">수정</button><button class="btn-del lh-banner-mini" data-action="del-banner" data-id="'+esc(b.id)+'">삭제</button></div></div>'}).join('')};
+  document.addEventListener('input',function(e){if(e.target&&e.target.id==='adm-banner-img')updatePreview()});
+  setTimeout(function(){updatePreview(); if($('adm-banner-list'))renderBannerList()},500);
 })();
 </script>
 </body>

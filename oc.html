@@ -904,5 +904,24 @@ if(window.syncOCFromFirebase){
   document.addEventListener('visibilitychange',function(){if(document.visibilityState==='hidden')remember()},{capture:true});
 })();
 </script>
+<script id="lakehouse-public-oc-sync-js">
+(function(){
+  function pull(){
+    if(!window._db||!window._fbGet||!window._fbRef)return false;
+    window._fbGet(window._fbRef(window._db,'lhdata')).then(function(snap){
+      if(!snap||!snap.exists())return;
+      var d=snap.val()||{};
+      if(d.oc_characters!==undefined)localStorage.setItem('oc_characters',JSON.stringify(d.oc_characters));
+      if(d.oc_categories!==undefined)localStorage.setItem('oc_categories',JSON.stringify(d.oc_categories));
+      if(typeof renderCategoryFilters==='function')renderCategoryFilters();
+      if(typeof renderGrid==='function')renderGrid();
+    }).catch(function(e){console.warn('[lakehouse] public OC sync failed',e&&e.code?e.code:e)});
+    return true;
+  }
+  function boot(n){if(pull())return;if(n<30)setTimeout(function(){boot(n+1)},250)}
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',function(){boot(0)});else boot(0);
+  window.addEventListener('pageshow',function(){boot(0)});
+})();
+</script>
 </body>
 </html>
