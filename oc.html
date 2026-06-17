@@ -145,161 +145,58 @@ input[type=file]{display:none;}
 #bgm-expand-btn{display:none;background:transparent;border:none;color:var(--pink);cursor:pointer;font-size:16px;width:100%;height:100%;align-items:center;justify-content:center;}
 #bgm-player.collapsed #bgm-expand-btn{display:flex;}
 
-/* ═══ DETAIL SCREEN REDESIGN ═══ */
+/* ═══ DETAIL SCREEN ═══ */
 #detail-screen{display:none;position:fixed;inset:0;z-index:400;background:var(--bg);}
 #detail-screen.active{display:flex;flex-direction:column;}
-
-/* 상단 바 */
-.game-topbar{
-  height:44px;background:rgba(10,8,6,.97);backdrop-filter:blur(12px);
-  border-bottom:1px solid var(--border);
-  display:flex;align-items:center;padding:0 1.5rem;gap:1rem;flex-shrink:0;
-  animation:fadeUp .4s ease both;
-}
-.game-back{
-  font-size:9px;letter-spacing:.18em;text-transform:uppercase;
-  color:var(--text-muted);background:transparent;border:1px solid var(--border);
-  padding:5px 12px;cursor:pointer;font-family:inherit;transition:all .2s;
-}
+.game-topbar{height:44px;background:rgba(10,8,6,.97);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 1.5rem;gap:1rem;flex-shrink:0;}
+.game-back{font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--text-muted);background:transparent;border:1px solid var(--border);padding:5px 12px;cursor:pointer;font-family:inherit;transition:all .2s;}
 .game-back:hover{border-color:var(--gold-dim);color:var(--gold);}
 .game-topbar-title{flex:1;font-family:'Cormorant Garamond',serif;font-style:italic;font-size:14px;color:var(--text-muted);}
 .game-topbar-id{font-size:9px;letter-spacing:.15em;color:var(--text-muted);}
 .btn-edit{padding:5px 14px;background:transparent;border:1px solid var(--gold-dim);color:var(--gold-dim);font-family:inherit;font-size:9px;letter-spacing:.12em;cursor:pointer;transition:all .2s;}
 .btn-edit:hover{background:rgba(196,154,108,.1);color:var(--gold);}
-
-/* 본문 레이아웃: 좌 2/5, 우 3/5 */
 .game-body{flex:1;display:grid;grid-template-columns:2fr 3fr;overflow:hidden;}
 
-/* ── 왼쪽: 캐릭터 일러스트 + 이름 오버레이 ── */
-.game-left{
-  position:relative;overflow:hidden;
-  background:linear-gradient(160deg,var(--bg2) 0%,var(--bg) 100%);
-  animation:fadeSlideLeft .7s cubic-bezier(.22,1,.36,1) both;
-}
-.game-char-bg{
-  position:absolute;inset:0;
-  background:radial-gradient(ellipse at 60% 40%,rgba(196,154,108,.07),transparent 65%);
-}
-.game-char-placeholder{
-  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
-  font-family:'Playfair Display',serif;font-style:italic;font-size:80px;
-  color:rgba(196,154,108,.06);
-}
-.game-char-img{
-  position:absolute;bottom:0;left:0;right:0;
-  width:100%;height:95%;object-fit:cover;object-position:top center;
-  display:block;
-}
-.game-char-gradient{
-  position:absolute;inset:0;
-  background:linear-gradient(to top,rgba(15,12,9,1) 0%,rgba(15,12,9,.5) 30%,transparent 65%),
-             linear-gradient(to right,rgba(15,12,9,.4) 0%,transparent 40%);
-}
-
-/* 왼쪽 이름 오버레이 */
-.game-name-overlay{
-  position:absolute;bottom:0;left:0;right:0;
-  padding:1.5rem 1.75rem 1.25rem;
-}
-.game-char-stars{
-  font-size:13px;color:var(--gold);letter-spacing:3px;
-  margin-bottom:.5rem;
-  animation:fadeSlideLeft .6s .15s cubic-bezier(.22,1,.36,1) both;
-}
-.game-char-name{
-  font-family:'Playfair Display',serif;font-style:italic;
-  font-size:clamp(28px,3.5vw,46px);color:var(--text);
-  line-height:1;letter-spacing:-.01em;
-  animation:fadeSlideLeft .7s .1s cubic-bezier(.22,1,.36,1) both;
-}
-.game-char-sub{
-  font-size:12px;color:var(--gold-dim);letter-spacing:.1em;margin-top:.3rem;
-  animation:fadeSlideLeft .6s .2s cubic-bezier(.22,1,.36,1) both;
-}
-.game-role-badge{
-  display:inline-block;margin-top:.5rem;
-  padding:3px 10px;border:1px solid var(--gold-dark);
-  font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold-dim);
-  animation:fadeSlideLeft .5s .25s cubic-bezier(.22,1,.36,1) both;
-}
-
-/* 코너 장식 */
+/* 왼쪽 */
+.game-left{position:relative;overflow:hidden;background:linear-gradient(160deg,var(--bg2) 0%,var(--bg) 100%);animation:fadeSlideLeft .7s cubic-bezier(.22,1,.36,1) both;}
+.game-char-bg{position:absolute;inset:0;background:radial-gradient(ellipse at 60% 40%,rgba(196,154,108,.07),transparent 65%);}
+.game-char-placeholder{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-style:italic;font-size:80px;color:rgba(196,154,108,.06);}
+.game-char-img{position:absolute;bottom:0;left:0;right:0;width:100%;height:95%;object-fit:cover;object-position:top center;display:block;}
+.game-char-gradient{position:absolute;inset:0;background:linear-gradient(to top,rgba(15,12,9,1) 0%,rgba(15,12,9,.5) 30%,transparent 65%),linear-gradient(to right,rgba(15,12,9,.4) 0%,transparent 40%);}
+.game-name-overlay{position:absolute;bottom:0;left:0;right:0;padding:1.5rem 1.75rem 1.25rem;}
+.game-char-stars{font-size:13px;color:var(--gold);letter-spacing:3px;margin-bottom:.5rem;animation:fadeSlideLeft .6s .15s cubic-bezier(.22,1,.36,1) both;}
+.game-char-name{font-family:'Playfair Display',serif;font-style:italic;font-size:clamp(26px,3vw,44px);color:var(--text);line-height:1;animation:fadeSlideLeft .7s .1s cubic-bezier(.22,1,.36,1) both;}
+.game-char-sub{font-size:12px;color:var(--gold-dim);letter-spacing:.1em;margin-top:.3rem;animation:fadeSlideLeft .6s .2s cubic-bezier(.22,1,.36,1) both;}
+.game-role-badge{display:inline-block;margin-top:.5rem;padding:3px 10px;border:1px solid var(--gold-dark);font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold-dim);animation:fadeSlideLeft .5s .25s cubic-bezier(.22,1,.36,1) both;}
 .game-corner{position:absolute;width:18px;height:18px;border-color:rgba(196,154,108,.3);border-style:solid;}
 .game-corner-tl{top:10px;left:10px;border-width:1px 0 0 1px;}
 .game-corner-tr{top:10px;right:10px;border-width:1px 1px 0 0;}
 .game-corner-bl{bottom:10px;left:10px;border-width:0 0 1px 1px;}
 .game-corner-br{bottom:10px;right:10px;border-width:0 1px 1px 0;}
-
-/* AU 버튼 */
-.au-buttons{
-  position:absolute;top:1rem;left:1rem;
-  display:flex;gap:6px;flex-wrap:wrap;
-}
-.au-btn{
-  padding:4px 10px;background:rgba(10,8,6,.75);
-  border:1px solid var(--border);color:var(--text-muted);
-  cursor:pointer;font-size:9px;letter-spacing:.1em;font-family:inherit;
-  backdrop-filter:blur(6px);transition:all .2s;
-}
+.au-buttons{position:absolute;top:1rem;left:1rem;display:flex;gap:6px;flex-wrap:wrap;}
+.au-btn{padding:4px 10px;background:rgba(10,8,6,.75);border:1px solid var(--border);color:var(--text-muted);cursor:pointer;font-size:9px;letter-spacing:.1em;font-family:inherit;backdrop-filter:blur(6px);transition:all .2s;}
 .au-btn.active,.au-btn:hover{border-color:var(--gold-dim);color:var(--gold);}
-
-/* 테마 플레이어 */
-.theme-player{
-  position:absolute;bottom:1rem;right:1rem;
-  display:flex;align-items:center;gap:8px;
-  background:rgba(10,8,6,.82);border:1px solid var(--border);
-  padding:6px 10px;backdrop-filter:blur(8px);min-width:180px;
-}
-.theme-play-btn{
-  width:26px;height:26px;background:transparent;
-  border:1px solid var(--gold-dim);color:var(--gold);
-  cursor:pointer;font-size:10px;flex-shrink:0;transition:all .2s;
-}
+.theme-player{position:absolute;bottom:1rem;right:1rem;display:flex;align-items:center;gap:8px;background:rgba(10,8,6,.82);border:1px solid var(--border);padding:6px 10px;backdrop-filter:blur(8px);min-width:180px;}
+.theme-play-btn{width:26px;height:26px;background:transparent;border:1px solid var(--gold-dim);color:var(--gold);cursor:pointer;font-size:10px;flex-shrink:0;transition:all .2s;}
 .theme-play-btn:hover{background:rgba(196,154,108,.15);}
 .theme-info{flex:1;min-width:0;}
 .theme-title{font-size:10px;color:var(--text-dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .theme-artist{font-size:9px;color:var(--text-muted);}
 
-/* ── 오른쪽: 정보 패널 ── */
-.game-right{
-  overflow-y:auto;display:flex;flex-direction:column;
-  background:rgba(10,8,6,.3);border-left:1px solid var(--border);
-  animation:fadeSlideRight .7s cubic-bezier(.22,1,.36,1) both;
-}
+/* 오른쪽 */
+.game-right{overflow-y:auto;display:flex;flex-direction:column;background:rgba(10,8,6,.3);border-left:1px solid var(--border);animation:fadeSlideRight .7s cubic-bezier(.22,1,.36,1) both;}
 .game-right::-webkit-scrollbar{width:2px;}
 .game-right::-webkit-scrollbar-thumb{background:var(--gold-dark);}
-
-/* 파일 헤더 */
-.game-file-header{
-  padding:1.25rem 1.5rem 1rem;
-  border-bottom:1px solid var(--border);flex-shrink:0;
-  animation:fadeUp .5s .1s cubic-bezier(.22,1,.36,1) both;
-}
+.game-file-header{padding:1.25rem 1.5rem 1rem;border-bottom:1px solid var(--border);flex-shrink:0;animation:fadeUp .5s .1s cubic-bezier(.22,1,.36,1) both;}
 .game-file-label{font-size:8px;letter-spacing:.28em;text-transform:uppercase;color:var(--gold-dim);margin-bottom:3px;font-family:'Cormorant Garamond',serif;font-style:italic;}
 .game-file-id{font-size:10px;color:var(--text-muted);letter-spacing:.12em;}
-
-/* 탭 */
-.game-tabs{
-  display:flex;border-bottom:1px solid var(--border);flex-shrink:0;
-  animation:fadeUp .5s .15s cubic-bezier(.22,1,.36,1) both;
-}
-.game-tab{
-  padding:8px 18px;font-size:9px;letter-spacing:.18em;text-transform:uppercase;
-  color:var(--text-muted);cursor:pointer;border-bottom:2px solid transparent;
-  transition:all .2s;
-}
+.game-tabs{display:flex;border-bottom:1px solid var(--border);flex-shrink:0;animation:fadeUp .5s .15s cubic-bezier(.22,1,.36,1) both;}
+.game-tab{padding:8px 18px;font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--text-muted);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;}
 .game-tab.active,.game-tab:hover{color:var(--gold);border-bottom-color:var(--gold);}
 .game-tab-content{display:none;padding:1.25rem 1.5rem;flex:1;}
 .game-tab-content.active{display:block;animation:fadeUp .4s .1s cubic-bezier(.22,1,.36,1) both;}
-
-/* 정보 블록 */
 .game-info-block{margin-bottom:1.25rem;}
-.game-section-label{
-  font-size:8px;letter-spacing:.24em;text-transform:uppercase;
-  color:var(--gold-dim);margin-bottom:.6rem;
-  font-family:'Cormorant Garamond',serif;font-style:italic;
-  padding-bottom:.4rem;border-bottom:1px solid var(--border);
-}
+.game-section-label{font-size:8px;letter-spacing:.24em;text-transform:uppercase;color:var(--gold-dim);margin-bottom:.6rem;font-family:'Cormorant Garamond',serif;font-style:italic;padding-bottom:.4rem;border-bottom:1px solid var(--border);}
 .game-profile-table{width:100%;border-collapse:collapse;}
 .game-profile-table tr{border-bottom:1px solid rgba(196,154,108,.1);}
 .game-profile-table td{padding:6px 0;font-size:12px;vertical-align:top;}
@@ -313,7 +210,6 @@ input[type=file]{display:none;}
 .game-novel-speaker{font-size:10px;color:var(--gold-dim);letter-spacing:.06em;flex-shrink:0;width:60px;text-align:right;padding-top:2px;}
 .game-novel-text{font-size:12px;color:var(--text-dim);line-height:1.85;}
 
-/* 애니메이션 */
 @keyframes fadeSlideLeft{from{opacity:0;transform:translateX(-24px);}to{opacity:1;transform:translateX(0);}}
 @keyframes fadeSlideRight{from{opacity:0;transform:translateX(24px);}to{opacity:1;transform:translateX(0);}}
 @keyframes fadeUp{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
@@ -888,8 +784,7 @@ function updateImgPreview(src){var preview=document.getElementById('ep-img-previ
 function updateImgStyle(){var src=document.getElementById('ep-img-data').value.trim();if(src)updateImgPreview(src);}
 function handleGalleryUpload(input){var files=Array.from(input.files);files.forEach(function(file){var reader=new FileReader();reader.onload=function(e){epGalleryData.push(e.target.result);renderGalleryList();};reader.readAsDataURL(file);});}
 function renderGalleryList(){
-  var el=document.getElementById('ep-gallery-list');
-  if(!el)return;
+  var el=document.getElementById('ep-gallery-list');if(!el)return;
   if(!epGalleryData.length){el.innerHTML='<div style="font-size:11px;color:var(--text-muted);">갤러리 없음</div>';return;}
   el.innerHTML='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;">'+epGalleryData.map(function(src,i){
     return '<div style="position:relative;aspect-ratio:2/3;background:var(--bg3);border:1px solid var(--border);overflow:hidden;">'
@@ -923,15 +818,10 @@ function handleAUImgUpload(input,i){
   var file=input.files[0];if(!file)return;
   var reader=new FileReader();
   reader.onload=function(e){
-    // epAuData 업데이트
     if(!epAuData[i])epAuData[i]={label:'',img:'',imgFit:'contain',imgPos:'center top'};
     epAuData[i].img=e.target.result;
-    // DOM input도 업데이트
     var items=document.querySelectorAll('#ep-au-list .au-edit-item');
-    if(items[i]){
-      var imgInput=items[i].querySelector('.au-img');
-      if(imgInput)imgInput.value=e.target.result;
-    }
+    if(items[i]){var imgInput=items[i].querySelector('.au-img');if(imgInput)imgInput.value=e.target.result;}
     updateAUPreview(i,e.target.result);
   };
   reader.readAsDataURL(file);
@@ -1004,16 +894,14 @@ function saveChar(){
   var themeFileData = document.getElementById('ep-theme-file-data') ? document.getElementById('ep-theme-file-data').value : '';
   var ytRaw=document.getElementById('ep-theme-yt').value.trim();
   var m=ytRaw.match(/(?:youtu\.be\/|v=|embed\/)([A-Za-z0-9_-]{11})/);var ytId=m?m[1]:ytRaw;
-  // collect AU - DOM 기반 (인덱스 제한 없음)
+  // collect AU - DOM 기반
   var auVersions=[];
   document.querySelectorAll('#ep-au-list .au-edit-item').forEach(function(item,i){
-    var label=(item.querySelector('.au-label')||{}).value||'';
     var imgEl=item.querySelector('.au-img');
     var imgVal=imgEl?imgEl.value.trim():'';
-    // 파일로 올린 경우 epAuData에 저장돼 있음
     if(!imgVal&&epAuData[i])imgVal=epAuData[i].img||'';
     auVersions.push({
-      label:label,
+      label:(item.querySelector('.au-label')||{}).value||'',
       img:imgVal,
       imgFit:(item.querySelector('.au-fit')||{}).value||'contain',
       imgPos:(item.querySelector('.au-pos')||{}).value||'center top'
