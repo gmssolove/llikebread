@@ -222,6 +222,10 @@ html,body{overflow:hidden!important}.right-panel{justify-content:center!importan
 /* Repair pass - no clipping, readable script, hidden sidebar scrollbar */
 .left-panel{scrollbar-width:none!important;-ms-overflow-style:none!important}.left-panel::-webkit-scrollbar{width:0!important;height:0!important;display:none!important}.right-panel{display:flex!important;align-items:center!important;justify-content:center!important;padding:2rem clamp(1.5rem,4vw,3.5rem)!important;overflow:hidden!important}.content-area{transform:none!important;width:100%!important;height:auto!important;min-height:0!important;display:flex!important;align-items:center!important;justify-content:center!important;overflow:visible!important}.content-block.active{transform:translateX(-54px)!important;width:min(760px,calc(100vw - 360px))!important;max-width:760px!important;overflow:visible!important;max-height:none!important}.content-block.active:not(#page-main) .page-heading{transform:translateX(-18px)!important}.world-cards{width:100%!important;margin-left:0!important}.world-card-item{min-height:88px!important}#page-main.active{transform:translateX(-54px)!important;width:min(760px,calc(100vw - 360px))!important}.nav-label{font-family:'Great Vibes','Pinyon Script','Cormorant Garamond','Playfair Display',serif!important;font-size:25px!important;line-height:1.05!important;letter-spacing:.01em!important;text-transform:none!important;font-style:normal!important;font-weight:400!important;color:rgba(236,226,215,.76)!important}.nav-item{min-height:47px!important;padding:7px 0!important}.nav-item:hover .nav-label,.nav-item.active .nav-label{color:var(--lake-copper-soft)!important}.nav-sub-item{font-family:'Pinyon Script','Cormorant Garamond',serif!important;font-size:18px!important;letter-spacing:.015em!important;font-style:normal!important;font-weight:400!important}.site-title{font-family:'Great Vibes','Pinyon Script','Cormorant Garamond',serif!important;font-size:34px!important;text-transform:none!important;font-style:normal!important;font-weight:400!important;letter-spacing:.01em!important}.adm-overlay{transform:none!important}.adm-overlay .content-area,.adm-overlay .content-block{transform:none!important}@media(max-width:900px){.content-block.active,#page-main.active{transform:none!important;width:min(760px,100%)!important}.content-block.active:not(#page-main) .page-heading{transform:none!important}}@media(max-width:760px){.left-panel{scrollbar-width:none!important}.content-area{display:block!important}.content-block.active,#page-main.active{width:100%!important;transform:none!important}}
 </style>
+<style id="lakehouse-final-override-css">
+/* Final override: readable soft-script menu, section offsets, bgm drag-safe expand */
+.nav-label{font-family:'Cormorant Garamond','Playfair Display','Noto Sans KR',serif!important;font-size:21px!important;line-height:1.18!important;letter-spacing:.045em!important;text-transform:none!important;font-style:italic!important;font-weight:500!important;color:rgba(236,226,215,.74)!important}.nav-item{min-height:47px!important;padding:7px 0!important}.nav-item:hover .nav-label,.nav-item.active .nav-label{color:var(--lake-copper-soft)!important}.nav-sub-item{font-family:'Cormorant Garamond','Playfair Display',serif!important;font-size:16.5px!important;letter-spacing:.04em!important;font-style:italic!important;font-weight:500!important}.site-title{font-family:'Cormorant Garamond','Playfair Display',serif!important;font-size:28px!important;font-style:italic!important;font-weight:500!important;letter-spacing:.045em!important}.content-area{justify-content:center!important;overflow:visible!important}.content-block.active:not(#page-main){transform:translateX(-82px)!important;width:min(760px,calc(100vw - 380px))!important;align-items:flex-start!important}.content-block.active:not(#page-main) .page-heading{transform:translate(-34px,-18px)!important;margin-bottom:.35rem!important}.content-block.active:not(#page-main) .page-sub{transform:translateX(-12px)!important;width:100%!important;max-width:720px!important;margin-bottom:1.1rem!important}.content-block.active:not(#page-main) .world-cards,.content-block.active:not(#page-main) #notice-list,.content-block.active:not(#page-main) #public-diary-list,.content-block.active:not(#page-main) #public-gallery-grid,.content-block.active:not(#page-main) #public-banner-list,.content-block.active:not(#page-main) .page-coming{transform:translateX(-12px)!important;width:min(720px,100%)!important;margin-left:0!important}#page-main.active{transform:translateX(-82px)!important}.world-card-item{min-height:90px!important}.adm-overlay,.adm-overlay *{transform:none!important}#bgm-player.collapsed{width:52px!important;height:52px!important;min-width:52px!important;max-width:52px!important;cursor:grab!important}#bgm-player.collapsed:active{cursor:grabbing!important}#bgm-player.collapsed #bgm-expand-btn{pointer-events:none!important}#bgm-player.collapsed.lh-click-ready #bgm-expand-btn{pointer-events:auto!important}@media(max-width:900px){.content-block.active:not(#page-main),#page-main.active{transform:none!important;width:min(760px,100%)!important}.content-block.active:not(#page-main) .page-heading,.content-block.active:not(#page-main) .page-sub,.content-block.active:not(#page-main) .world-cards,.content-block.active:not(#page-main) #notice-list,.content-block.active:not(#page-main) #public-diary-list,.content-block.active:not(#page-main) #public-gallery-grid,.content-block.active:not(#page-main) #public-banner-list,.content-block.active:not(#page-main) .page-coming{transform:none!important}}
+</style>
 </head>
 <body>
 
@@ -1550,6 +1554,33 @@ document.querySelectorAll('.auth-input').forEach(function(inp){inp.addEventListe
       if(moved||Date.now()<suppressUntil){e.preventDefault();e.stopImmediatePropagation();return;}
       expand(p,e);
     },true);
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install);else install();
+  setTimeout(install,1000);
+})();
+</script>
+<script id="lakehouse-final-drag-js">
+(function(){
+  var startX=0,startY=0,dragged=false,downAt=0,suppressUntil=0;
+  function ui(v){try{localStorage.setItem('lh_bgm_ui_state',JSON.stringify(Object.assign(JSON.parse(localStorage.getItem('lh_bgm_ui_state')||'{}'),v||{})))}catch(e){}}
+  function install(){
+    var p=document.getElementById('bgm-player'); if(!p||p.dataset.lhFinalDragFix)return; p.dataset.lhFinalDragFix='1';
+    function markReady(){ if(p.classList.contains('collapsed')) p.classList.add('lh-click-ready'); }
+    function unready(){ p.classList.remove('lh-click-ready'); }
+    p.addEventListener('pointerdown',function(e){startX=e.clientX;startY=e.clientY;downAt=Date.now();dragged=false;unready();},true);
+    document.addEventListener('pointermove',function(e){if(!downAt)return;if(Math.abs(e.clientX-startX)>3||Math.abs(e.clientY-startY)>3){dragged=true;unready();}},true);
+    document.addEventListener('pointerup',function(){
+      if(!downAt)return;
+      if(dragged){suppressUntil=Date.now()+700;setTimeout(function(){dragged=false;downAt=0;unready();},720)}
+      else{setTimeout(function(){markReady();downAt=0;},20)}
+    },true);
+    p.addEventListener('click',function(e){
+      if(!p.classList.contains('collapsed'))return;
+      if(dragged||Date.now()<suppressUntil){e.preventDefault();e.stopImmediatePropagation();unready();return;}
+      e.preventDefault();e.stopImmediatePropagation();p.classList.remove('collapsed');unready();ui({collapsed:false});
+    },true);
+    var close=document.getElementById('bgm-toggle-collapse');
+    if(close&&!close.dataset.lhFinalRight){close.dataset.lhFinalRight='1';close.addEventListener('click',function(){var r=p.getBoundingClientRect();setTimeout(function(){p.style.right='auto';p.style.bottom='auto';p.style.left=Math.max(0,r.right-52)+'px';p.style.top=r.top+'px';ui({collapsed:true,posLeft:p.style.left,posTop:p.style.top});},30)},true)}
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install);else install();
   setTimeout(install,1000);
