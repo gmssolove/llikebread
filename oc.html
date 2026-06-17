@@ -198,6 +198,9 @@ input[type=file]{display:none;}
 #bgm-toggle-collapse:hover{color:var(--pink);}
 #bgm-expand-btn{display:none;background:transparent;border:none;color:var(--pink);cursor:pointer;font-size:16px;width:100%;height:100%;align-items:center;justify-content:center;}
 #bgm-player.collapsed #bgm-expand-btn{display:flex;}
+
+.game-body{will-change:transform;transform-style:preserve-3d;}
+.game-char-img{will-change:transform;transition:transform .05s linear;}
 </style>
 <style id="lakehouse-codex-css">
 :root{--lake-ink:#0b0d0c;--lake-panel:rgba(16,18,16,.86);--lake-panel-2:rgba(29,31,28,.78);--lake-copper:#d7a982;--lake-copper-soft:#f0cfad;--lake-copper-deep:#9f7358;--lake-mist:#d8d5cb;--lake-muted:rgba(216,213,203,.58);--lake-line:rgba(215,169,130,.42);--lake-line-soft:rgba(215,169,130,.18);--lake-green:#7e8a7c;--lake-rose:#b98375}
@@ -1241,7 +1244,50 @@ if(window.syncOCFromFirebase){
   function hexToRgba(hex,a){hex=String(hex||'#101210').replace('#','');if(hex.length===3)hex=hex.split('').map(function(x){return x+x}).join('');var n=parseInt(hex,16);return 'rgba('+((n>>16)&255)+','+((n>>8)&255)+','+(n&255)+','+a+')'}
   function extraInfo(c){var host=$('gtab-info');if(!host)return;var old=host.querySelector('.lh-info-extra');if(old)old.remove();var pieces=[];if(c.special)pieces.push(['특이사항',c.special]);if(c.hobby)pieces.push(['취미 / 특기',c.hobby]);if(arr(c.keywords).length)pieces.push(['KEYWORD',arr(c.keywords).join(' · ')]);if(arr(c.likes).length)pieces.push(['LIKE',arr(c.likes).join(' · ')]);if(arr(c.hates).length)pieces.push(['HATE',arr(c.hates).join(' · ')]);if(arr(c.items).length)pieces.push(['소지품',arr(c.items).join(' · ')]);if(!pieces.length)return;host.insertAdjacentHTML('beforeend','<div class="lh-info-extra">'+pieces.map(function(p){return'<div class="lh-info-piece"><div class="lh-info-piece-title">'+esc(p[0])+'</div><div class="lh-info-piece-body">'+esc(p[1])+'</div></div>'}).join('')+'</div>')}
   var oldOpenDetail=window.openDetail;window.openDetail=function(c,auIdx){var fresh=c;if(c&&c.id!=null){var found=arr(getChars()).find(function(x){return String(x.id)===String(c.id)});if(found)fresh=found}window.currentChar=fresh;try{currentChar=fresh}catch(e){}if(oldOpenDetail)oldOpenDetail(fresh,auIdx);setTimeout(function(){applyColors(fresh);extraInfo(fresh);document.querySelectorAll('.lh-info-piece,.game-profile-table tr,.lh-side-panel .lh-profile-line,.lh-side-panel .lh-stat,.lh-side-panel .lh-chip').forEach(function(el){el.style.animation='none';void el.offsetWidth;el.style.animation=''})},0)};
-  var tiltHost=null;document.addEventListener('mousemove',function(e){var screen=$('detail-screen');if(!screen||!screen.classList.contains('active'))return;var body=screen.querySelector('.game-body');if(!body)return;var r=screen.getBoundingClientRect(),x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;screen.style.setProperty('--mx',Math.round((x+.5)*100)+'%');screen.style.setProperty('--my',Math.round((y+.5)*100)+'%');body.style.transform='perspective(1200px) rotateY('+(x*3.2).toFixed(2)+'deg) rotateX('+(-y*2.4).toFixed(2)+'deg)'});
+  // Tilt effect: RAF + CSS transition (성능 최적화)
+(function(){
+  var raf=null, tx=0, ty=0, cx=0, cy=0;
+  var LERP=0.08; // 부드러운 추적 속도 (낮을수록 느리게)
+  var MAX_X=4, MAX_Y=3; // 최대 기울기 (도)
+  function lerp(a,b,t){return a+(b-a)*t;}
+  function loop(){
+    cx=lerp(cx,tx,LERP);
+    cy=lerp(cy,ty,LERP);
+    var body=document.querySelector('#detail-screen.active .game-body');
+    var img=document.querySelector('#detail-screen.active .game-char-img');
+    if(body){
+      // game-body 전체 기울기
+      body.style.transform='perspective(1400px) rotateY('+cx.toFixed(3)+'deg) rotateX('+(-cy).toFixed(3)+'deg)';
+    }
+    if(img){
+      // 캐릭터 이미지 반대 방향으로 살짝 더 기울어서 입체감
+      img.style.transform='perspective(1400px) rotateY('+(cx*1.5).toFixed(3)+'deg) rotateX('+(-cy*1.2).toFixed(3)+'deg) scale(1.02)';
+    }
+    if(Math.abs(cx-tx)>0.01||Math.abs(cy-ty)>0.01) raf=requestAnimationFrame(loop);
+    else raf=null;
+  }
+  document.addEventListener('mousemove',function(e){
+    var screen=document.getElementById('detail-screen');
+    if(!screen||!screen.classList.contains('active'))return;
+    var r=screen.getBoundingClientRect();
+    tx=(e.clientX-r.left)/r.width*2-1; // -1 ~ 1
+    ty=(e.clientY-r.top)/r.height*2-1;
+    tx*=MAX_X; ty*=MAX_Y;
+    if(!raf)raf=requestAnimationFrame(loop);
+  },{passive:true});
+  // 마우스 나가면 원위치로
+  document.addEventListener('mouseleave',function(){tx=0;ty=0;if(!raf)raf=requestAnimationFrame(loop);});
+  // 디테일 닫힐 때 초기화
+  var oldClose=window.closeDetail;
+  window.closeDetail=function(){
+    tx=0;ty=0;cx=0;cy=0;
+    var body=document.querySelector('#detail-screen .game-body');
+    var img=document.querySelector('#detail-screen .game-char-img');
+    if(body)body.style.transform='';
+    if(img)img.style.transform='';
+    if(oldClose)oldClose();
+  };
+})();
   document.addEventListener('mouseleave',function(){var screen=$('detail-screen'),body=screen&&screen.querySelector('.game-body');if(body)body.style.transform=''},true);
   var typingTimer=0,typingDone=true,dialoguePos=0;
   function currentDialogue(){var id=window.currentChar&&window.currentChar.id;var fresh=arr(getChars()).find(function(c){return String(c.id)===String(id)});return arr((fresh||window.currentChar||{}).dialogue)}

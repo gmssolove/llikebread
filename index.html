@@ -184,6 +184,31 @@ nav{display:flex;flex-direction:column;gap:2px;}
 #bgm-toggle-collapse:hover{color:var(--pink);}
 #bgm-expand-btn{display:none;background:transparent;border:none;color:var(--pink);cursor:pointer;font-size:16px;width:100%;height:100%;align-items:center;justify-content:center;}
 #bgm-player.collapsed #bgm-expand-btn{display:flex;}
+
+/* 배너 타일 */
+.lh-banner-tile{position:relative;width:88px;height:31px;background:var(--bg2);border:1px solid var(--border);overflow:hidden;display:flex;align-items:center;justify-content:center;transition:border-color .2s;}
+a:hover .lh-banner-tile{border-color:var(--gold-dim,var(--pink-dim));}
+.lh-banner-tooltip{position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:rgba(15,12,9,.95);border:1px solid var(--border);color:var(--text-dim);font-size:10px;padding:4px 8px;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .18s;letter-spacing:.06em;}
+.lh-banner-tile:hover .lh-banner-tooltip{opacity:1;}
+/* 배너 목록 컨테이너 */
+#public-banner-list{display:flex;flex-wrap:wrap;gap:6px;margin-top:.75rem;}
+
+/* OC 대사 커스텀 레이아웃 정리 */
+.lh-oc-admin-row{display:flex;flex-direction:column;gap:6px;margin-bottom:8px;padding:8px;background:var(--bg2);border:1px solid var(--border);}
+.lh-oc-admin-row .lh-oc-admin-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+.lh-oc-admin-row textarea.form-input{width:100%;min-height:60px;}
+.lh-oc-admin-actions{display:flex;gap:6px;margin-top:4px;}
+.lh-oc-admin-row-wide{display:flex;flex-direction:column;gap:6px;}
+
+/* 배너 관리자 패널 */
+.lh-banner-editor{display:flex;flex-direction:column;gap:.6rem;margin-bottom:1rem;}
+.lh-banner-preview{width:88px;height:31px;background:var(--bg3);border:1px solid var(--border);overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--text-muted);}
+.lh-banner-preview img{width:100%;height:100%;object-fit:contain;}
+.lh-banner-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);}
+.lh-banner-thumb{width:88px;height:31px;flex-shrink:0;background:var(--bg3);border:1px solid var(--border);overflow:hidden;display:flex;align-items:center;justify-content:center;}
+.lh-banner-thumb img{width:100%;height:100%;object-fit:contain;}
+.lh-banner-row-actions{display:flex;gap:4px;flex-shrink:0;margin-left:auto;}
+.lh-banner-mini{padding:3px 8px!important;font-size:9px!important;}
 </style>
 <style id="lakehouse-codex-css">
 :root{--lake-ink:#0b0d0c;--lake-panel:rgba(16,18,16,.86);--lake-panel-2:rgba(29,31,28,.78);--lake-copper:#d7a982;--lake-copper-soft:#f0cfad;--lake-copper-deep:#9f7358;--lake-mist:#d8d5cb;--lake-muted:rgba(216,213,203,.58);--lake-line:rgba(215,169,130,.42);--lake-line-soft:rgba(215,169,130,.18);--lake-green:#7e8a7c;--lake-rose:#b98375}
@@ -1615,8 +1640,12 @@ function renderPublicBanner(){
   if(!list||!list.length){el.innerHTML='';if(empty)empty.style.display='block';return;}
   if(empty)empty.style.display='none';
   el.innerHTML=list.map(function(b){
-    var inner='<div style="width:88px;height:31px;background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--text-muted);">'+(b.img?'<img src="'+b.img+'" style="width:100%;height:100%;object-fit:cover;">':b.name)+'</div>';
-    return b.url?'<a href="'+b.url+'" target="_blank" rel="noopener">'+inner+'</a>':inner;
+    var esc=function(s){return String(s||'').replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]});};
+    var imgHtml=b.img
+      ?'<img src="'+esc(b.img)+'" alt="'+esc(b.name)+'" style="width:100%;height:100%;object-fit:contain;display:block;">'
+      :'<span style="font-size:10px;color:var(--text-muted);padding:4px;">'+esc(b.name)+'</span>';
+    var inner='<div class="lh-banner-tile" title="'+esc(b.name)+'">'+imgHtml+'<div class="lh-banner-tooltip">'+esc(b.name)+'</div></div>';
+    return b.url?'<a href="'+esc(b.url)+'" target="_blank" rel="noopener" style="text-decoration:none;">'+inner+'</a>':inner;
   }).join('');
 }
 
