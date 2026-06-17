@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
@@ -1912,5 +1912,71 @@ window.submitGuest=function(){const auth_user=window._currentUser;if(!auth_user)
   };
 })();
 </script>
+<style id="lakehouse-final-dialog-banner-guest-css">
+#adm-banner-preview,.lh-banner-thumb{width:200px!important;height:40px!important;min-width:200px!important;border-radius:4px!important}#adm-banner-preview img,.lh-banner-thumb img{width:200px!important;height:40px!important;object-fit:cover!important}#public-banner-list a,#public-banner-list img,#public-banner-list .lh-public-banner{width:200px!important;height:40px!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;overflow:hidden!important}#public-banner-list img{object-fit:cover!important}.lh-dialog-overlay{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;padding:22px;background:rgba(2,3,3,.54);backdrop-filter:blur(8px);animation:lhDialogFade .24s ease both}.lh-dialog-box{width:min(420px,calc(100vw - 44px));padding:24px 24px 20px;background:linear-gradient(135deg,rgba(18,20,18,.96),rgba(35,32,28,.94));border:1px solid rgba(215,169,130,.34);border-radius:20px;box-shadow:0 28px 90px rgba(0,0,0,.58),inset 0 0 0 1px rgba(255,255,255,.035);animation:lhDialogRise .34s cubic-bezier(.16,1,.3,1) both}.lh-dialog-title{font-family:'Cormorant Upright','Cormorant Garamond',serif;font-size:25px;color:rgba(240,207,173,.9);margin-bottom:10px}.lh-dialog-message{font-size:13px;line-height:1.75;color:rgba(234,231,222,.82);white-space:pre-wrap}.lh-dialog-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:20px}.lh-dialog-actions button,.guest-reply-editor button{border:1px solid rgba(215,169,130,.3);background:rgba(215,169,130,.08);color:rgba(240,231,220,.82);border-radius:999px;padding:7px 14px;font-size:12px;cursor:pointer}.lh-dialog-actions button:hover,.guest-reply-editor button:hover{border-color:rgba(240,207,173,.62);color:rgba(255,238,218,.95)}.lh-dialog-actions .danger{background:rgba(125,47,47,.2);border-color:rgba(214,116,100,.38)}@keyframes lhDialogFade{from{opacity:0}to{opacity:1}}@keyframes lhDialogRise{from{opacity:0;transform:translateY(18px) scale(.96);filter:blur(8px)}to{opacity:1;transform:none;filter:blur(0)}}#guest-list .guest-bubble{min-height:0!important;padding:13px 15px!important}.guest-reply{margin:8px 0 0 28px!important;padding:8px 11px!important;font-size:12px!important;line-height:1.55!important;max-width:calc(100% - 28px)!important;border-radius:14px 14px 5px 14px!important}.guest-reply::before{font-size:9px!important;margin-bottom:4px!important}.guest-reply-editor{margin:10px 0 0 28px;padding:10px;border:1px solid rgba(215,169,130,.22);border-radius:14px;background:rgba(5,6,6,.34)}.guest-reply-editor textarea{width:100%;min-height:74px;resize:vertical;background:rgba(0,0,0,.22);border:1px solid rgba(215,169,130,.22);border-radius:10px;color:rgba(235,231,222,.88);padding:10px;font:12px/1.6 inherit;box-sizing:border-box}.guest-reply-editor-actions{display:flex;justify-content:flex-end;gap:6px;margin-top:8px}
+</style>
+<script id="lakehouse-final-dialog-js">
+(function(){
+  function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+  function openDialog(opts){return new Promise(function(resolve){var ov=document.createElement('div');ov.className='lh-dialog-overlay';var sourceButtons=opts.buttons||[{label:'확인',value:true}];var buttons=sourceButtons.map(function(b,i){return '<button type="button" class="'+(b.danger?'danger':'')+'" data-i="'+i+'">'+esc(b.label)+'</button>'}).join('');ov.innerHTML='<div class="lh-dialog-box" role="dialog" aria-modal="true"><div class="lh-dialog-title">'+esc(opts.title||'확인')+'</div><div class="lh-dialog-message">'+esc(opts.message||'')+'</div><div class="lh-dialog-actions">'+buttons+'</div></div>';document.body.appendChild(ov);ov.querySelectorAll('button').forEach(function(btn){btn.addEventListener('click',function(){var b=sourceButtons[parseInt(btn.dataset.i,10)]||{value:true};ov.remove();resolve(b.value)})});ov.addEventListener('click',function(e){if(e.target===ov){ov.remove();resolve(false)}});setTimeout(function(){var f=ov.querySelector('button');if(f)f.focus()},30)})}
+  window.LakeDialog={alert:function(message,title){return openDialog({title:title||'알림',message:message,buttons:[{label:'확인',value:true}]})},confirm:function(message,title){return openDialog({title:title||'확인',message:message,buttons:[{label:'취소',value:false},{label:'확인',value:true,danger:true}]})}};
+  function safeMsg(msg){return window.LakeDialog&&LakeDialog.confirm?LakeDialog.confirm(msg):Promise.resolve(confirm(msg))}
+  setTimeout(function(){
+    if(typeof getOCChars==='function'&&typeof setOCChars==='function')window.deleteOCChar=function(id){safeMsg('이 OC 캐릭터를 삭제할까요?').then(function(ok){if(!ok)return;setOCChars(getOCChars().filter(function(c){return String(c.id)!==String(id)}));window.ocEditId=null;var p=document.getElementById('oc-char-edit-panel');if(p)p.textContent='캐릭터를 선택하세요.';if(typeof renderOCCharList==='function')renderOCCharList()})};
+    if(typeof getPairs==='function'&&typeof setPairs==='function')window.deletePairItem=function(id){safeMsg('이 페어 항목을 삭제할까요?').then(function(ok){if(!ok)return;setPairs(getPairs().filter(function(p){return String(p.id)!==String(id)}));window.pairEditId=null;var p=document.getElementById('pair-edit-panel');if(p)p.textContent='페어를 선택하세요.';if(typeof renderPairList==='function')renderPairList()})};
+    if(typeof getCats==='function'&&typeof setCats==='function')window.deleteCat=function(cat){safeMsg(cat+' 카테고리를 삭제할까요?').then(function(ok){if(!ok)return;setCats(getCats().filter(function(c){return c!==cat}));if(typeof renderCatList==='function')renderCatList()})};
+    if(typeof getDiary==='function'&&typeof setDiary==='function')window.deleteDiaryEntry=function(id){safeMsg('이 다이어리 글을 삭제할까요?').then(function(ok){if(!ok)return;setDiary(getDiary().filter(function(x){return String(x.id)!==String(id)}));if(typeof renderDiaryList==='function')renderDiaryList()})};
+    if(typeof getTrpg==='function'&&typeof setTrpg==='function')window.deleteTrpgEntry=function(id){safeMsg('이 TRPG 항목을 삭제할까요?').then(function(ok){if(!ok)return;setTrpg(getTrpg().filter(function(x){return String(x.id)!==String(id)}));if(typeof renderTrpgList==='function')renderTrpgList();if(typeof renderTrpgCards==='function')renderTrpgCards()})};
+    if(typeof getBanners==='function'&&typeof setBanners==='function')window.deleteBannerItem=function(id){safeMsg('이 배너를 삭제할까요?').then(function(ok){if(!ok)return;setBanners(getBanners().filter(function(x){return String(x.id)!==String(id)}));if(typeof renderBannerList==='function')renderBannerList();if(typeof renderPublicBanner==='function')renderPublicBanner()})};
+  },0);
+})();
+</script>
+<script type="module" id="lakehouse-guest-inline-reply-final-js">
+import{getDatabase,ref,onValue,set,push,remove}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+const db=window._db||getDatabase();
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function js(s){return String(s==null?'':s).replace(/\\/g,'\\\\').replace(/'/g,"\\'")}
+function renderGuest(data){const list=document.getElementById('guest-list');if(!list)return;if(!data||!Object.keys(data).length){list.innerHTML='<div class="page-coming">— 아직 방명록이 없습니다 —</div>';return}list.innerHTML=Object.keys(data).reverse().map(k=>{const g=data[k]||{},admin=!!window._isAdmin,reply=(g.reply&&g.reply.text)||'';return '<div class="guest-bubble" data-guest-id="'+esc(k)+'"><div class="guest-bubble-head"><span>'+esc(g.name||'익명')+'</span>'+(g.date?'<span style="color:var(--text-muted);font-size:10px;">'+esc(g.date)+'</span>':'')+(admin?'<span class="guest-actions"><button onclick="openGuestReplyEditor(\''+js(k)+'\')">'+(reply?'답변 수정':'답변')+'</button>'+(reply?'<button onclick="deleteGuestReply(\''+js(k)+'\')">답변 삭제</button>':'')+'<button onclick="deleteGuest(\''+js(k)+'\')">삭제</button></span>':'')+'</div><div class="guest-bubble-msg">'+esc(g.msg||'')+'</div>'+(reply?'<div class="guest-reply">'+esc(reply)+'</div>':'')+(admin?'<div class="guest-reply-editor" id="guest-reply-editor-'+esc(k)+'" hidden><textarea id="guest-reply-text-'+esc(k)+'" placeholder="관리자 답변을 적어주세요">'+esc(reply)+'</textarea><div class="guest-reply-editor-actions"><button onclick="closeGuestReplyEditor(\''+js(k)+'\')">취소</button><button onclick="saveGuestReply(\''+js(k)+'\')">저장</button></div></div>':'')+'</div>'}).join('')}
+let lastGuestAdmin=null;onValue(ref(db,'site/guest'),snap=>{window._guestData=snap.exists()?snap.val():{};renderGuest(window._guestData);lastGuestAdmin=!!window._isAdmin});setInterval(()=>{if(lastGuestAdmin!==!!window._isAdmin){lastGuestAdmin=!!window._isAdmin;renderGuest(window._guestData||{})}},600);
+window.openGuestReplyEditor=function(k){if(!window._isAdmin)return;const el=document.getElementById('guest-reply-editor-'+k);if(!el)return;el.hidden=false;const t=document.getElementById('guest-reply-text-'+k);if(t){t.focus();t.selectionStart=t.value.length;t.selectionEnd=t.value.length}};
+window.closeGuestReplyEditor=function(k){const el=document.getElementById('guest-reply-editor-'+k);if(el)el.hidden=true};
+window.saveGuestReply=function(k){if(!window._isAdmin)return;const t=document.getElementById('guest-reply-text-'+k);const text=t?t.value.trim():'';if(!text){if(window.LakeDialog)LakeDialog.alert('답변 내용을 입력해주세요.');return}set(ref(db,'site/guest/'+k+'/reply'),{text:text,date:new Date().toLocaleDateString('ko-KR')}).then(()=>{if(window.LakeDialog)LakeDialog.alert('답변을 저장했어요.','저장 완료')})};
+window.replyGuest=window.openGuestReplyEditor;window.editGuestReply=window.openGuestReplyEditor;
+window.deleteGuestReply=function(k){if(!window._isAdmin)return;(window.LakeDialog?LakeDialog.confirm('답변을 삭제할까요?'):Promise.resolve(confirm('답변을 삭제할까요?'))).then(ok=>{if(ok)set(ref(db,'site/guest/'+k+'/reply'),null)})};
+window.deleteGuest=function(k){if(!window._isAdmin)return;(window.LakeDialog?LakeDialog.confirm('방명록을 삭제할까요?'):Promise.resolve(confirm('방명록을 삭제할까요?'))).then(ok=>{if(ok)remove(ref(db,'site/guest/'+k))})};
+window.submitGuest=function(){const auth_user=window._currentUser;if(!auth_user){if(window.LakeDialog)LakeDialog.alert('로그인 후 방명록을 작성할 수 있습니다.');return}const msg=document.getElementById('guest-msg').value.trim();if(!msg)return;const rawName=document.getElementById('guest-name').value.trim();const count=window._guestData?Object.keys(window._guestData).length+1:1;push(ref(db,'site/guest'),{name:'No. '+count+' '+(rawName||'익명'),msg:msg,date:new Date().toLocaleDateString('ko-KR'),uid:auth_user.uid});document.getElementById('guest-name').value='';document.getElementById('guest-msg').value=''};
+</script>
+<script id="lakehouse-admin-oc-save-hardening-js">
+(function(){
+  function $(id){return document.getElementById(id)}
+  function val(id){var el=$(id);return el?el.value:''}
+  function yt(raw){raw=(raw||'').trim();var m=raw.match(/[?&]v=([^&]+)/)||raw.match(/youtu\.be\/([^?&]+)/);return m?m[1]:raw}
+  function csv(id){return val(id).split(',').map(function(x){return x.trim()}).filter(Boolean)}
+  function rows(sel,kcls,vcls){var out=[];document.querySelectorAll(sel).forEach(function(r){var k=r.querySelector(kcls),v=r.querySelector(vcls);k=k?k.value.trim():'';v=v?v.value.trim():'';if(k||v)out.push({k:k,v:v})});return out}
+  function write(chars){localStorage.setItem('oc_characters',JSON.stringify(chars));var tries=0;(function push(){try{if(window._db&&window._fbSet&&window._fbRef){window._fbSet(window._fbRef(window._db,'lhdata/oc_characters'),chars).then(function(){console.log('[Lakehouse Admin OC] saved')}).catch(function(e){console.error('[Lakehouse Admin OC] Firebase save failed',e)});return}}catch(e){console.error('[Lakehouse Admin OC] save failed',e)}if(tries++<40)setTimeout(push,125)})()}
+  window.setOCChars=function(v){write(v)};
+  window.saveOCChar=function(id){
+    var chars=getOCChars(),idx=chars.findIndex(function(c){return String(c.id)===String(id)});if(idx<0){if(window.LakeDialog)LakeDialog.alert('캐릭터 데이터를 찾지 못했습니다.');else alert('캐릭터 데이터를 찾지 못했습니다.');return}
+    var old=chars[idx],profile=rows('#oce-profile-rows .lh-oc-admin-row','.prof-key','.prof-val'),stats=rows('#oce-stat-rows .lh-oc-admin-row','.stat-key','.stat-val'),auVersions=[],dialogue=[];
+    document.querySelectorAll('#oce-au-rows .lh-oc-admin-row').forEach(function(r,i){var label=r.querySelector('.au-label'),img=r.querySelector('.au-img'),fit=r.querySelector('.au-fit'),pos=r.querySelector('.au-pos');var image=img&&img.value.trim();if((label&&label.value.trim())||image)auVersions.push({label:(label&&label.value.trim())||('Ver.'+(i+1)),img:image||'',imgFit:(fit&&fit.value.trim())||'contain',imgPos:(pos&&pos.value.trim())||'center top'})});
+    document.querySelectorAll('#oce-dialogue-rows .lh-oc-admin-row').forEach(function(r,i){var idv=(r.querySelector('.dlg-id')||{}).value||String(i+1),text=((r.querySelector('.dlg-text')||{}).value||'').trim();if(!text)return;var choices=((r.querySelector('.dlg-choices')||{}).value||'').split('\n').map(function(line){var p=line.split('|');return{label:(p[0]||'').trim(),next:(p[1]||'').trim()}}).filter(function(c){return c.label});dialogue.push({id:idv.trim(),speaker:((r.querySelector('.dlg-speaker')||{}).value||'').trim(),text:text,expression:((r.querySelector('.dlg-expression')||{}).value||'').trim(),choices:choices})});
+    var themeFile=val('oce-theme-file'),themeYt=yt(val('oce-theme-yt'));
+    var item=Object.assign({},old,{name:val('oce-name'),nameSub:val('oce-sub'),role:val('oce-role'),category:val('oce-cat'),subcat:val('oce-subcat'),stars:parseInt(val('oce-stars'),10)||5,img:val('oce-img').trim(),desc:val('oce-desc'),profile:profile,special:val('oce-special'),hobby:val('oce-hobby'),keywords:csv('oce-keywords'),likes:csv('oce-likes'),hates:csv('oce-hates'),items:csv('oce-items'),stats:stats,auVersions:auVersions,dialogue:dialogue,dialogueStart:dialogue[0]&&dialogue[0].id,theme:{title:val('oce-theme-title'),artist:val('oce-theme-artist'),youtubeId:themeFile?'':themeYt,fileData:themeFile||(old.theme&&old.theme.fileData)||''}});
+    chars[idx]=item;write(chars);if(typeof renderOCCharList==='function')renderOCCharList();if(typeof editOCChar==='function')editOCChar(id);var msg=$('oce-save-msg');if(msg){msg.textContent='저장 완료!';msg.style.display='block';setTimeout(function(){msg.style.display='none'},1800)}else if(window.LakeDialog)LakeDialog.alert('저장 완료!','저장 완료');
+  };
+})();
+</script>
+<script id="lakehouse-final-popup-stragglers-js">
+(function(){
+  function ask(msg){return window.LakeDialog&&LakeDialog.confirm?LakeDialog.confirm(msg):Promise.resolve(confirm(msg))}
+  setTimeout(function(){
+    if(typeof getKsChars==='function'&&typeof setKsChars==='function')window.deleteKsChar=function(id){ask('이 캐릭터를 삭제할까요?').then(function(ok){if(!ok)return;setKsChars(getKsChars().filter(function(c){return String(c.id)!==String(id)}));window.ksEditId=null;var p=document.getElementById('ks-char-edit-panel');if(p)p.textContent='캐릭터를 선택하세요.';if(typeof renderKsCharList==='function')renderKsCharList()})};
+  },0);
+})();
+</script>
 </body>
 </html>
+
+
+
+
