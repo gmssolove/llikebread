@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OC Archive — lakehouse</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Playfair+Display:ital,wght@0,400;0,500;1,400;1,500&family=Noto+Sans+KR:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --bg:#151210;--bg2:#1d1814;--bg3:#252018;
+  --gold:#c49a6c;--gold-light:#e8c99a;--gold-dim:#8a6a45;--gold-dark:#5a4228;
+  --text:#e8ddd0;--text-dim:#b8a898;--text-muted:#7a6a58;
+  --border:rgba(196,154,108,0.18);--border-strong:rgba(196,154,108,0.45);
+  --pink:var(--gold);--pink-light:var(--gold-light);--pink-dim:var(--gold-dim);--pink-dark:var(--gold-dark);
+}
+body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-serif;font-weight:400;overflow:hidden;height:100vh;}
+
+/* TOP BAR */
+.topbar{height:48px;background:rgba(10,8,6,0.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 1.5rem;gap:1rem;position:sticky;top:0;z-index:200;}
+.topbar-back{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--text-muted);text-decoration:none;transition:color .2s;display:flex;align-items:center;gap:6px;}
+.topbar-back:hover{color:var(--gold);}
+.topbar-title{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:13px;color:var(--text-muted);flex:1;}
+.topbar-right{display:flex;align-items:center;gap:1rem;}
+.topbar-links a{font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--text-muted);text-decoration:none;padding:4px 10px;border:1px solid transparent;transition:all .2s;}
+.topbar-links a.active,.topbar-links a:hover{color:var(--gold);border-color:var(--border);}
+
+/* LAYOUT */
+.layout{display:flex;height:calc(100vh - 48px);overflow:hidden;}
+
+/* LEFT SIDEBAR */
+.sidebar{width:200px;flex-shrink:0;background:rgba(8,6,4,0.7);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;}
+.sidebar-header{padding:1.25rem 1.25rem 1rem;border-bottom:1px solid var(--border);flex-shrink:0;}
+.sidebar-tag{font-size:8px;letter-spacing:.25em;text-transform:uppercase;color:var(--gold-dim);margin-bottom:4px;font-family:'Cormorant Garamond',serif;}
+.sidebar-title{font-family:'Playfair Display',serif;font-style:italic;font-size:14px;color:var(--gold-light);}
+.sidebar-sub{font-size:8px;letter-spacing:.15em;text-transform:uppercase;color:var(--text-muted);margin-top:2px;}
+
+.search-wrap{padding:.6rem 1rem;border-bottom:1px solid var(--border);flex-shrink:0;}
+.search-input{width:100%;padding:5px 8px;background:transparent;border:none;border-bottom:1px solid var(--border);color:var(--text);font-family:inherit;font-size:11px;outline:none;}
+.search-input::placeholder{color:var(--text-muted);font-size:10px;}
+.search-input:focus{border-bottom-color:var(--gold-dim);}
+
+.cat-section-label{font-size:8px;letter-spacing:.22em;text-transform:uppercase;color:var(--gold-dim);padding:.75rem 1.25rem .35rem;font-family:'Cormorant Garamond',serif;font-style:italic;flex-shrink:0;}
+.filter-group{display:flex;flex-direction:column;overflow-y:auto;}
+.filter-btn{display:flex;align-items:center;gap:10px;padding:9px 1.25rem;font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--text-muted);background:transparent;border:none;border-left:2px solid transparent;cursor:pointer;text-align:left;transition:all .18s;width:100%;font-family:inherit;}
+.filter-btn:hover{color:var(--text);background:rgba(196,154,108,0.04);border-left-color:var(--gold-dim);}
+.filter-btn.active{color:var(--gold-light);background:rgba(196,154,108,0.07);border-left-color:var(--gold);}
+.filter-btn-icon{width:18px;font-size:12px;color:var(--gold-dim);flex-shrink:0;text-align:center;}
+.filter-btn.active .filter-btn-icon{color:var(--gold);}
+
+.sidebar-count{padding:.6rem 1.25rem;font-size:9px;letter-spacing:.12em;color:var(--gold-dim);border-top:1px solid var(--border);margin-top:auto;flex-shrink:0;}
+
+/* MAIN CONTENT */
+.main-content{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.grid-header{display:flex;align-items:center;justify-content:space-between;padding:.75rem 1.5rem;border-bottom:1px solid var(--border);flex-shrink:0;}
+.grid-header-title{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--text-muted);}
+.grid-header-count{font-size:9px;letter-spacing:.1em;color:var(--gold-dim);font-family:'Cormorant Garamond',serif;font-style:italic;}
+.card-scroll{flex:1;overflow-y:auto;padding:1.25rem 1.5rem;}
+.card-scroll::-webkit-scrollbar{width:3px;}
+.card-scroll::-webkit-scrollbar-thumb{background:var(--gold-dark);}
+
+/* CARD GRID */
+.card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px;}
+
+/* CARD */
+.char-card{aspect-ratio:2/3;background:var(--bg3);border:1px solid var(--border);position:relative;overflow:hidden;cursor:pointer;transition:border-color .25s,transform .2s;}
+.char-card:hover{border-color:var(--gold-dim);transform:translateY(-3px);}
+.char-card-img{width:100%;height:100%;object-fit:cover;object-position:top;display:block;}
+.char-card-placeholder{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-style:italic;font-size:40px;color:rgba(196,154,108,0.1);}
+.char-card-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(10,8,6,.92) 0%,rgba(10,8,6,.2) 50%,transparent 100%);}
+.char-card-bottom{position:absolute;bottom:0;left:0;right:0;padding:.5rem .6rem;}
+.char-card-name{font-size:10px;color:var(--text);letter-spacing:.03em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.char-card-role{font-size:8px;color:var(--gold-dim);letter-spacing:.08em;margin-top:1px;}
+/* 모서리 장식 */
+.char-card::before,.char-card::after{content:'';position:absolute;width:10px;height:10px;border-color:rgba(196,154,108,0.3);border-style:solid;opacity:0;transition:opacity .25s;z-index:2;}
+.char-card::before{top:5px;left:5px;border-width:1px 0 0 1px;}
+.char-card::after{bottom:5px;right:5px;border-width:0 1px 1px 0;}
+.char-card:hover::before,.char-card:hover::after,.char-card.active-card::before,.char-card.active-card::after{opacity:1;}
+.char-card.active-card{border-color:var(--gold);}
+
+/* GAME DETAIL SCREEN */
+#detail-screen{display:none;position:fixed;inset:0;z-index:400;background:var(--bg);}
+#detail-screen.active{display:flex;flex-direction:column;}
+.game-topbar{height:48px;background:rgba(10,8,6,.97);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 1.5rem;gap:1rem;flex-shrink:0;}
+.game-back{background:transparent;border:1px solid var(--border);color:var(--text-muted);cursor:pointer;padding:5px 14px;font-family:inherit;font-size:9px;letter-spacing:.15em;text-transform:uppercase;transition:all .2s;}
+.game-back:hover{border-color:var(--gold-dim);color:var(--gold);}
+.game-topbar-title{flex:1;font-family:'Cormorant Garamond',serif;font-style:italic;font-size:14px;color:var(--text-muted);}
+.game-topbar-id{font-size:9px;letter-spacing:.15em;color:var(--text-muted);}
+.btn-edit{padding:5px 16px;background:transparent;border:1px solid var(--gold-dim);color:var(--gold-dim);font-family:inherit;font-size:9px;letter-spacing:.15em;text-transform:uppercase;cursor:pointer;transition:all .2s;}
+.btn-edit:hover{background:rgba(196,154,108,.1);color:var(--gold);}
+.game-body{flex:1;display:grid;grid-template-columns:340px 1fr;overflow:hidden;}
+.game-left{position:relative;overflow:hidden;background:var(--bg2);border-right:1px solid var(--border);}
+.game-char-bg{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 80%,rgba(196,154,108,0.07),transparent 70%);}
+.game-char-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top;transition:opacity .5s;}
+.game-char-placeholder{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-style:italic;font-size:80px;color:rgba(196,154,108,0.07);}
+.game-char-gradient{position:absolute;inset:0;background:linear-gradient(to top,rgba(15,12,9,1) 0%,rgba(15,12,9,.3) 40%,transparent 70%);}
+.game-corner{position:absolute;width:20px;height:20px;border-color:var(--gold-dim);border-style:solid;}
+.game-corner-tl{top:12px;left:12px;border-width:1px 0 0 1px;}
+.game-corner-tr{top:12px;right:12px;border-width:1px 1px 0 0;}
+.game-corner-bl{bottom:12px;left:12px;border-width:0 0 1px 1px;}
+.game-corner-br{bottom:12px;right:12px;border-width:0 1px 1px 0;}
+.theme-player{position:absolute;bottom:3.5rem;left:1rem;right:1rem;display:flex;align-items:center;gap:10px;background:rgba(10,8,6,.85);border:1px solid var(--border);padding:8px 12px;backdrop-filter:blur(8px);}
+.theme-play-btn{width:28px;height:28px;background:transparent;border:1px solid var(--gold-dim);color:var(--gold);cursor:pointer;font-size:11px;flex-shrink:0;transition:all .2s;}
+.theme-play-btn:hover{background:rgba(196,154,108,.15);}
+.theme-info{flex:1;min-width:0;}
+.theme-title{font-size:11px;color:var(--text-dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.theme-artist{font-size:9px;color:var(--text-muted);}
+.au-buttons{position:absolute;bottom:1rem;left:1rem;right:1rem;display:flex;gap:6px;flex-wrap:wrap;}
+.au-btn{padding:4px 10px;background:rgba(10,8,6,.8);border:1px solid var(--border);color:var(--text-muted);cursor:pointer;font-size:9px;letter-spacing:.1em;transition:all .2s;font-family:inherit;}
+.au-btn.active,.au-btn:hover{border-color:var(--gold-dim);color:var(--gold);}
+.game-right{overflow-y:auto;padding:1.5rem 2rem;display:flex;flex-direction:column;gap:0;}
+.game-right::-webkit-scrollbar{width:3px;}
+.game-right::-webkit-scrollbar-thumb{background:var(--gold-dark);}
+.game-file-header{margin-bottom:1rem;padding-bottom:1rem;border-bottom:1px solid var(--border);}
+.game-file-label{font-size:8px;letter-spacing:.25em;text-transform:uppercase;color:var(--gold-dim);margin-bottom:4px;font-family:'Cormorant Garamond',serif;font-style:italic;}
+.game-file-id{font-family:'Playfair Display',serif;font-style:italic;font-size:11px;color:var(--text-muted);}
+.game-role-badge{display:inline-block;padding:3px 10px;border:1px solid var(--gold-dark);font-size:8px;letter-spacing:.15em;text-transform:uppercase;color:var(--gold-dim);margin-top:4px;}
+.game-tabs{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:1rem;}
+.game-tab{padding:7px 16px;font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--text-muted);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;}
+.game-tab.active,.game-tab:hover{color:var(--gold);border-bottom-color:var(--gold);}
+.game-tab-content{display:none;}
+.game-tab-content.active{display:block;}
+.game-info-block{margin-bottom:1.25rem;opacity:0;transform:translateY(8px);transition:opacity .4s,transform .4s;}
+.game-info-block.visible{opacity:1;transform:translateY(0);}
+.game-char-stars{font-size:11px;color:var(--gold);letter-spacing:2px;margin-bottom:.35rem;}
+.game-char-name-block{margin-bottom:.35rem;}
+.game-char-name{font-family:'Playfair Display',serif;font-style:italic;font-size:26px;color:var(--text);line-height:1.1;}
+.game-char-sub{font-size:11px;color:var(--gold-dim);letter-spacing:.06em;}
+.game-section-label{font-size:8px;letter-spacing:.22em;text-transform:uppercase;color:var(--gold-dim);margin-bottom:.6rem;font-family:'Cormorant Garamond',serif;font-style:italic;}
+.game-profile-table{width:100%;border-collapse:collapse;}
+.game-profile-table tr{border-bottom:1px solid var(--border);}
+.game-profile-table td{padding:6px 0;font-size:12px;vertical-align:top;}
+.game-profile-table td:first-child{color:var(--text-muted);width:80px;font-size:10px;letter-spacing:.06em;}
+.game-profile-table td:last-child{color:var(--text-dim);}
+.game-desc{font-size:12px;color:var(--text-dim);line-height:1.9;}
+.game-gallery-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.game-gallery-img{width:100%;aspect-ratio:1;object-fit:cover;object-position:top;border:1px solid var(--border);cursor:pointer;transition:border-color .2s;}
+.game-gallery-img:hover{border-color:var(--gold-dim);}
+.game-novel-line{display:flex;gap:12px;margin-bottom:.75rem;}
+.game-novel-speaker{font-size:10px;color:var(--gold-dim);letter-spacing:.06em;flex-shrink:0;width:60px;text-align:right;padding-top:2px;}
+.game-novel-text{font-size:12px;color:var(--text-dim);line-height:1.8;}
+
+/* EDIT PANEL */
+#edit-panel{display:none;position:fixed;top:0;right:0;bottom:0;width:420px;z-index:600;background:var(--bg2);border-left:1px solid var(--border);overflow-y:auto;padding:1.5rem;box-shadow:-6px 0 32px rgba(0,0,0,.6);}
+#edit-panel.active{display:block;}
+#edit-panel::-webkit-scrollbar{width:3px;}
+#edit-panel::-webkit-scrollbar-thumb{background:var(--gold-dark);}
+.ep-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;}
+.ep-title{font-family:'Playfair Display',serif;font-style:italic;font-size:18px;color:var(--gold-light);}
+.ep-close{background:transparent;border:1px solid var(--border);color:var(--text-muted);cursor:pointer;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:12px;transition:all .2s;}
+.ep-close:hover{border-color:var(--gold-dim);color:var(--gold);}
+.form-group{margin-bottom:.8rem;}
+.form-label{font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-muted);margin-bottom:4px;display:block;}
+.form-input{width:100%;padding:7px 10px;background:var(--bg3);border:1px solid var(--border);color:var(--text);font-family:inherit;font-size:12px;outline:none;resize:vertical;}
+.form-input:focus{border-color:var(--gold-dim);}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.btn-save{padding:7px 18px;background:rgba(196,154,108,.15);border:1px solid var(--gold-dim);color:var(--gold);font-family:inherit;font-size:9px;letter-spacing:.15em;text-transform:uppercase;cursor:pointer;transition:all .2s;}
+.btn-save:hover{background:rgba(196,154,108,.3);}
+.btn-del{padding:6px 12px;background:transparent;border:1px solid rgba(139,26,26,.4);color:rgba(192,57,43,.7);font-family:inherit;font-size:9px;cursor:pointer;}
+.save-msg{font-size:11px;color:var(--gold);margin-top:6px;display:none;}
+.section-sep{border-top:1px solid var(--border);margin:1rem 0;padding-top:1rem;}
+.section-sep-title{font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold-dim);margin-bottom:.75rem;}
+.img-upload-wrap{display:flex;flex-direction:column;gap:6px;}
+.img-preview{width:100%;height:160px;background:var(--bg3);border:1px solid var(--border);overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--text-muted);}
+.img-preview img{width:100%;height:100%;object-fit:cover;object-position:top;}
+.img-size-controls{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+.file-input-label{display:block;padding:7px;background:var(--bg3);border:1px solid var(--border);color:var(--text-muted);font-size:10px;letter-spacing:.08em;text-align:center;cursor:pointer;transition:all .2s;}
+.file-input-label:hover{border-color:var(--gold-dim);color:var(--gold);}
+input[type=file]{display:none;}
+.drag-handle{cursor:grab;color:var(--text-muted);}
+.profile-drag-item{display:flex;align-items:center;gap:6px;padding:4px 0;}
+.prof-key{width:70px;}
+.prof-val{flex:1;}
+.au-edit-item{background:var(--bg3);border:1px solid var(--border);padding:8px;margin-bottom:6px;}
+.au-preview{width:100%;height:60px;object-fit:cover;object-position:top;background:var(--bg2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;}
+.vn-row{display:flex;gap:6px;margin-bottom:4px;}
+.vn-speaker{width:70px;flex-shrink:0;}
+.drag-over{border:1px dashed var(--gold-dim);}
+.filter-btn{font-size:9px;}
+
+/* BGM */
+#bgm-player{position:fixed;bottom:1.5rem;right:1.5rem;z-index:999;background:rgba(15,12,9,.96);border:1px solid var(--border);border-radius:12px;backdrop-filter:blur(16px);display:flex;align-items:center;gap:10px;padding:10px 14px;min-width:240px;max-width:320px;box-shadow:0 4px 24px rgba(0,0,0,.5);cursor:move;user-select:none;overflow:hidden;transition:min-width .3s,max-width .3s,padding .3s,border-radius .3s,width .3s,height .3s;}
+#bgm-player.collapsed{min-width:0;max-width:none;width:44px;height:44px;padding:0;border-radius:50%;justify-content:flex-end;}
+#bgm-player.collapsed #bgm-info,#bgm-player.collapsed #bgm-vol-wrap,#bgm-player.collapsed #bgm-toggle-collapse,#bgm-player.collapsed #bgm-play-btn{display:none;}
+#bgm-play-btn{width:30px;height:30px;flex-shrink:0;background:transparent;border:1px solid var(--gold-dim);border-radius:50%;color:var(--gold);cursor:pointer;font-size:11px;display:flex;align-items:center;justify-content:center;transition:all .2s;}
+#bgm-play-btn:hover{background:rgba(196,154,108,.2);}
+#bgm-info{flex:1;min-width:0;}
+#bgm-title{font-size:10px;color:var(--text-dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+#bgm-artist{font-size:9px;color:var(--text-muted);margin-top:1px;}
+#bgm-vol-wrap{display:flex;align-items:center;}
+#bgm-vol{width:55px;accent-color:var(--gold);cursor:pointer;}
+#bgm-toggle-collapse{background:transparent;border:none;color:var(--text-muted);cursor:pointer;font-size:12px;padding:2px 4px;flex-shrink:0;transition:color .2s;}
+#bgm-toggle-collapse:hover{color:var(--gold);}
+#bgm-expand-btn{display:none;background:transparent;border:none;color:var(--gold);cursor:pointer;font-size:15px;width:100%;height:100%;align-items:center;justify-content:center;}
+#bgm-player.collapsed #bgm-expand-btn{display:flex;}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a href="index.html" class="topbar-back">← back</a>
+  <div class="topbar-title">アルカイヴ &nbsp;/&nbsp; Character Archive</div>
+  <div class="topbar-right">
+    <div class="topbar-links">
+      <a href="oc.html" class="active">OC</a>
+      <a href="pair.html">Pair</a>
+    </div>
+  </div>
+</div>
+
+<div class="layout">
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-tag">◈ archive</div>
+      <div class="sidebar-title">Character Archive</div>
+      <div class="sidebar-sub">OC Collection</div>
+    </div>
+    <div class="search-wrap">
+      <input class="search-input" id="search-input" placeholder="이름으로 검색..." oninput="renderGrid()">
+    </div>
+    <div class="cat-section-label">Category</div>
+    <div class="filter-group" id="category-filters"></div>
+    <div id="sub-filter-wrap" style="display:none;">
+      <div class="cat-section-label" id="sub-filter-title">—</div>
+      <div class="filter-group" id="sub-filters"></div>
+    </div>
+    <div class="sidebar-count" id="char-count"></div>
+  </div>
+
+  <div class="main-content">
+    <div class="grid-header">
+      <div class="grid-header-title" id="grid-label">ALL</div>
+      <div class="grid-header-count" id="char-count2"></div>
+    </div>
+    <div class="card-scroll">
+      <div class="card-grid" id="card-grid"></div>
+    </div>
+  </div>
+</div>
+
+<div id="detail-screen">
+  <div class="game-topbar">
+    <button class="game-back" onclick="closeDetail()">← 목록으로</button>
+    <div class="game-topbar-title" id="game-topbar-title">—</div>
+    <div class="game-topbar-id" id="game-topbar-id"></div>
+    <button class="btn-edit" id="btn-edit" style="display:none;" onclick="openEditPanel()">✎ 수정</button>
+  </div>
+  <div class="game-body">
+    <div class="game-left" id="game-left">
+      <div class="game-char-bg"></div>
+      <div class="game-char-placeholder" id="game-placeholder">—</div>
+      <img id="game-char-img" style="display:none;" alt="" class="game-char-img">
+      <div class="game-char-gradient"></div>
+      <div class="game-corner game-corner-tl"></div>
+      <div class="game-corner game-corner-tr"></div>
+      <div class="game-corner game-corner-bl"></div>
+      <div class="game-corner game-corner-br"></div>
+      <!-- THEME PLAYER -->
+      <div class="theme-player" id="theme-player" style="display:none;">
+        <button class="theme-play-btn" id="theme-play-btn" onclick="toggleTheme()">▶</button>
+        <div class="theme-info">
+          <div class="theme-title" id="theme-title">—</div>
+          <div class="theme-artist" id="theme-artist"></div>
+        </div>
+      </div>
+      <!-- AU BUTTONS -->
+      <div class="au-buttons" id="au-buttons"></div>
+    </div>
+    <div class="game-right">
+      <div class="game-file-header">
+        <div class="game-file-label">CHARACTER FILE</div>
+        <div class="game-file-id" id="game-file-id">—</div>
+        <div class="game-role-badge" id="game-role">—</div>
+      </div>
+      <div class="game-tabs">
+        <div class="game-tab active" onclick="switchTab('info',this)">Info</div>
+        <div class="game-tab" onclick="switchTab('story',this)">Story</div>
+        <div class="game-tab" onclick="switchTab('gallery',this)">Gallery</div>
+        <div class="game-tab" onclick="switchTab('novel',this)">Novel</div>
+      </div>
+      <div class="game-tab-content active" id="gtab-info">
+        <div class="game-info-block" id="info-name-block">
+          <div class="game-char-stars" id="game-stars">★★★★★</div>
+          <div class="game-char-name-block">
+            <div class="game-char-name" id="game-name">—</div>
+            <div class="game-char-sub" id="game-sub">—</div>
+          </div>
+          <div class="game-role-badge" id="game-role2" style="margin-bottom:1rem;">—</div>
+        </div>
+        <div class="game-info-block" id="info-profile-block">
+          <div class="game-section-label">기본 정보</div>
+          <table class="game-profile-table" id="game-profile-table"></table>
+        </div>
+        <div class="game-info-block" id="info-desc-block">
+          <div class="game-section-label">소개</div>
+          <div class="game-desc" id="game-desc">—</div>
+        </div>
+      </div>
+      <div class="game-tab-content" id="gtab-story">
+        <div class="game-desc" id="game-story" style="white-space:pre-wrap;">—</div>
+      </div>
+      <div class="game-tab-content" id="gtab-gallery">
+        <div class="game-gallery-grid" id="game-gallery"></div>
+      </div>
+      <div class="game-tab-content" id="gtab-novel">
+        <div id="game-novel"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT PANEL -->
+
+<div id="edit-panel">
+  <div class="ep-header">
+    <div class="ep-title">캐릭터 수정</div>
+    <button class="ep-close" onclick="closeEditPanel()">✕</button>
+  </div>
+  <div class="form-row">
+    <div class="form-group"><label class="form-label">이름</label><input class="form-input" id="ep-name"></div>
+    <div class="form-group"><label class="form-label">서브명</label><input class="form-input" id="ep-namesub"></div>
+  </div>
+  <div class="form-row">
+    <div class="form-group"><label class="form-label">역할</label><input class="form-input" id="ep-role"></div>
+    <div class="form-group"><label class="form-label">소속</label><input class="form-input" id="ep-faction"></div>
+  </div>
+  <div class="form-row">
+    <div class="form-group"><label class="form-label">카테고리</label><select class="form-input" id="ep-category"></select></div>
+    <div class="form-group"><label class="form-label">서브카테고리</label><input class="form-input" id="ep-subcat"></div>
+  </div>
+  <div class="form-row">
+    <div class="form-group"><label class="form-label">태그</label><input class="form-input" id="ep-tag"></div>
+    <div class="form-group"><label class="form-label">별점(1~5)</label><input class="form-input" type="number" id="ep-stars" min="1" max="5"></div>
+  </div>
+
+  <!-- THEME SONG -->
+  <div class="section-sep">
+    <div class="section-sep-title">테마곡 (캐릭터별 BGM)</div>
+    <div class="form-group"><label class="form-label">곡 제목</label><input class="form-input" id="ep-theme-title" placeholder="테마곡 이름"></div>
+    <div class="form-group"><label class="form-label">아티스트</label><input class="form-input" id="ep-theme-artist" placeholder="아티스트"></div>
+    <div style="border:1px solid var(--border);padding:10px;background:var(--bg3);">
+      <div style="font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-muted);margin-bottom:8px;">소스 선택</div>
+      <div style="display:flex;gap:8px;margin-bottom:8px;">
+        <button class="filter-btn active" id="theme-src-yt" onclick="setThemeSrc('yt')" style="flex:1;justify-content:center;">유튜브</button>
+        <button class="filter-btn" id="theme-src-file" onclick="setThemeSrc('file')" style="flex:1;justify-content:center;">파일</button>
+      </div>
+      <div id="theme-yt-input">
+        <input class="form-input" id="ep-theme-yt" placeholder="https://youtu.be/...">
+      </div>
+      <div id="theme-file-input" style="display:none;">
+        <label class="file-input-label">🎵 오디오 파일 선택 (MP3/OGG/WAV)<input type="file" accept="audio/*" onchange="handleThemeFileUpload(this)"></label>
+        <div id="theme-file-name" style="font-size:11px;color:var(--text-muted);margin-top:4px;"></div>
+        <input type="hidden" id="ep-theme-file-data">
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN IMAGE -->
+  <div class="section-sep">
+    <div class="section-sep-title">기본 이미지</div>
+    <div class="img-upload-wrap">
+      <div class="img-preview" id="ep-img-preview">이미지 없음</div>
+      <div class="img-size-controls">
+        <div class="form-group"><label class="form-label">Fit</label><select class="form-input" id="ep-img-fit" onchange="updateImgStyle()"><option value="contain">Contain</option><option value="cover">Cover</option></select></div>
+        <div class="form-group"><label class="form-label">위치</label><select class="form-input" id="ep-img-pos" onchange="updateImgStyle()"><option value="center top">위쪽</option><option value="center center">중앙</option><option value="center bottom">아래</option></select></div>
+      </div>
+      <label class="file-input-label">📁 파일 선택<input type="file" accept="image/*" onchange="handleImgUpload(this)"></label>
+      <input class="form-input" id="ep-img-data" placeholder="또는 URL 입력" oninput="previewUrl(this.value)">
+    </div>
+  </div>
+
+  <!-- AU VERSIONS -->
+  <div class="section-sep">
+    <div class="section-sep-title">AU / 버전 추가</div>
+    <div id="ep-au-list"></div>
+    <button class="btn-save" style="margin-top:8px;padding:5px 12px;" onclick="addAUItem()">+ 버전 추가</button>
+  </div>
+
+  <div class="form-group"><label class="form-label">소개</label><textarea class="form-input" id="ep-desc" rows="2"></textarea></div>
+
+  <div class="section-sep">
+    <div class="section-sep-title">프로필 항목 (드래그로 순서 변경)</div>
+    <div class="profile-drag-list" id="ep-profile-rows"></div>
+    <button class="btn-save" style="margin-top:8px;padding:5px 12px;" onclick="addProfileRow()">+ 항목 추가</button>
+  </div>
+  <div class="section-sep">
+    <div class="section-sep-title">서사</div>
+    <textarea class="form-input" id="ep-story" rows="4"></textarea>
+  </div>
+  <div class="section-sep">
+    <div class="section-sep-title">갤러리 이미지</div>
+    <label class="file-input-label">📁 이미지 추가 (여러 장)<input type="file" accept="image/*" multiple onchange="handleGalleryUpload(this)"></label>
+    <div id="ep-gallery-list" style="margin-top:8px;display:flex;flex-direction:column;gap:4px;"></div>
+  </div>
+  <div class="section-sep">
+    <div class="section-sep-title">VN 대사</div>
+    <div id="ep-vn-rows"></div>
+    <button class="btn-save" style="margin-top:6px;padding:5px 12px;" onclick="addVNRow()">+ 대사 추가</button>
+  </div>
+  <div class="section-sep" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+    <button class="btn-save" onclick="saveChar()">저장</button>
+    <button class="btn-del" onclick="deleteChar()">삭제</button>
+    <div class="save-msg" id="ep-save-msg">저장되었습니다.</div>
+  </div>
+</div>
+
+<div id="yt-container" style="position:fixed;bottom:-9999px;left:-9999px;width:1px;height:1px;overflow:hidden;"></div>
+<div id="theme-yt-container"></div>
+
+<div id="bgm-player">
+  <button id="bgm-play-btn">▶</button>
+  <div id="bgm-info"><div id="bgm-title">BGM</div><div id="bgm-artist"></div></div>
+  <div id="bgm-vol-wrap"><input type="range" id="bgm-vol" min="0" max="100" value="40"></div>
+  <button id="bgm-toggle-collapse">✕</button>
+  <button id="bgm-expand-btn">♪</button>
+</div>
+
+<script type="module">
+import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import{getAuth,onAuthStateChanged}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import{getDatabase,ref,get,set,onValue}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+const cfg={apiKey:"AIzaSyAdyaVA95hYEbPDfCRwNI0mretcowocGfM",authDomain:"llikebread.firebaseapp.com",databaseURL:"https://llikebread-default-rtdb.asia-southeast1.firebasedatabase.app",projectId:"llikebread",storageBucket:"llikebread.firebasestorage.app",messagingSenderId:"227317366345",appId:"1:227317366345:web:472530c2616612899e0998"};
+const app=initializeApp(cfg);
+const auth=getAuth(app);
+const db=getDatabase(app);
+window._db=db; window._fbSet=set; window._fbRef=ref; window._fbGet=get;
+
+onAuthStateChanged(auth,function(user){
+  window._isAdmin=!!(user&&user.email==="gmssolove@naver.com");
+  var btn=document.getElementById('btn-edit');
+  if(btn)btn.style.display=window._isAdmin?'block':'none';
+});
+
+// 실시간 동기화
+onValue(ref(db,'lhdata/oc_characters'),function(snap){
+  if(snap.exists()){localStorage.setItem('oc_characters',JSON.stringify(snap.val()));renderGrid();}
+});
+onValue(ref(db,'lhdata/oc_categories'),function(snap){
+  if(snap.exists()){localStorage.setItem('oc_categories',JSON.stringify(snap.val()));renderCategoryFilters();renderGrid();}
+});
+
+// BGM Firebase
+window.syncOCFromFirebase=function(cb){
+  get(ref(db,'lhdata')).then(function(snap){
+    if(snap.exists()){var d=snap.val();['oc_characters','oc_categories'].forEach(function(k){if(d[k])localStorage.setItem(k,JSON.stringify(d[k]));});}
+    if(cb)cb();
+  }).catch(function(){if(cb)cb();});
+};
+</script>
+
+<script>
+window._isAdmin=false;
+window._bgmYtId='';
+window._bgmIsPlaying=false;
+
+var defaultOC=[
+  {id:1,name:'윤단',nameSub:'Yundan',role:'Creator',category:'세계관',subcat:'윤단×네가이',faction:'',stars:5,tag:'yundan',img:'',imgFit:'contain',imgPos:'center top',desc:'다솜의 보컬 커버 아티스트 페르소나.',profile:[{k:'유형',v:'페르소나'}],story:'',gallery:[],novel:[],vnLines:[],theme:{title:'',artist:'',youtubeId:''},auVersions:[]},
+  {id:2,name:'네가이',nameSub:'願',role:'Silent',category:'세계관',subcat:'윤단×네가이',faction:'',stars:5,tag:'negai',img:'',imgFit:'contain',imgPos:'center top',desc:'말없이 곁에 있는 존재.',profile:[],story:'',gallery:[],novel:[],vnLines:[],theme:{title:'',artist:'',youtubeId:''},auVersions:[]},
+  {id:3,name:'박설',nameSub:'Park Seol',role:'착호갑사',category:'TRPG',subcat:'시나리오 1',faction:'',stars:4,tag:'seol',img:'',imgFit:'contain',imgPos:'center top',desc:'조선 시대 착호갑사.',profile:[{k:'직업',v:'착호갑사'}],story:'',gallery:[],novel:[],vnLines:[],theme:{title:'',artist:'',youtubeId:''},auVersions:[]}
+];
+defaultCats=['세계관','TRPG'];
+
+function gd(k,d){try{return JSON.parse(localStorage.getItem(k))||d;}catch(e){return d;}}
+function setChars(v){
+  localStorage.setItem('oc_characters',JSON.stringify(v));
+  if(window._db&&window._fbSet&&window._fbRef){try{window._fbSet(window._fbRef(window._db,'lhdata/oc_characters'),v);}catch(e){}}
+}
+function getChars(){try{return JSON.parse(localStorage.getItem('oc_characters'))||defaultOC;}catch(e){return defaultOC;}}
+function setCats(v){
+  localStorage.setItem('oc_categories',JSON.stringify(v));
+  if(window._db&&window._fbSet&&window._fbRef){try{window._fbSet(window._fbRef(window._db,'lhdata/oc_categories'),v);}catch(e){}}
+}
+function getCats(){try{return JSON.parse(localStorage.getItem('oc_categories'))||defaultCats;}catch(e){return defaultCats;}}
+
+var activeCat='all',activeSub='all',currentChar=null,currentAuIdx=-1,epGalleryData=[],dragSrcIndex=null;
+
+// ── CATEGORY FILTERS ──
+function renderCategoryFilters(){
+  var cats=getCats(),wrap=document.getElementById('category-filters');
+  var catIcons={'세계관':'◎','TRPG':'⚔','키사라기':'如','기타':'◈'};
+  wrap.innerHTML='';
+  var allBtn=document.createElement('button');
+  allBtn.className='filter-btn'+(activeCat==='all'?' active':'');
+  allBtn.innerHTML='<span class="filter-btn-icon">▣</span>전체';
+  allBtn.onclick=function(){setFilter('cat','all',this);};
+  wrap.appendChild(allBtn);
+  cats.forEach(function(cat){
+    var btn=document.createElement('button');
+    btn.className='filter-btn'+(activeCat===cat?' active':'');
+    btn.innerHTML='<span class="filter-btn-icon">'+(catIcons[cat]||'◆')+'</span>'+cat;
+    btn.onclick=function(){setFilter('cat',cat,this);};
+    wrap.appendChild(btn);
+  });
+}
+function setFilter(type,val,btn){
+  if(type==='cat'){activeCat=val;activeSub='all';document.querySelectorAll('#category-filters .filter-btn').forEach(function(b){b.classList.remove('active');});if(btn)btn.classList.add('active');}
+  if(type==='sub'){activeSub=val;document.querySelectorAll('#sub-filters .filter-btn').forEach(function(b){b.classList.remove('active');});if(btn)btn.classList.add('active');}
+  updateSubFilters();
+  renderGrid();
+  var gl=document.getElementById('grid-label');
+  if(gl)gl.textContent=(type==='cat'?val:'all').toUpperCase()==='ALL'?'ALL':val.toUpperCase();
+}
+function updateSubFilters(){
+  var chars=getChars();
+  var subs=[...new Set(chars.filter(function(c){return activeCat==='all'||c.category===activeCat;}).map(function(c){return c.subcat;}).filter(Boolean))];
+  var wrap=document.getElementById('sub-filter-wrap');
+  if(!subs.length){wrap.style.display='none';return;}
+  wrap.style.display='block';
+  var sf=document.getElementById('sub-filters');sf.innerHTML='';
+  var allBtn=document.createElement('button');
+  allBtn.className='filter-btn'+(activeSub==='all'?' active':'');
+  allBtn.textContent='전체';
+  allBtn.onclick=function(){setFilter('sub','all',this);};
+  sf.appendChild(allBtn);
+  subs.forEach(function(sub){
+    var btn=document.createElement('button');
+    btn.className='filter-btn'+(activeSub===sub?' active':'');
+    btn.textContent=sub;
+    btn.onclick=function(){setFilter('sub',sub,this);};
+    sf.appendChild(btn);
+  });
+}
+
+// ── GRID ──
+function renderGrid(){
+  var chars=getChars(),search=(document.getElementById('search-input')||{value:''}).value.toLowerCase();
+  var filtered=chars.filter(function(c){
+    if(activeCat!=='all'&&c.category!==activeCat)return false;
+    if(activeSub!=='all'&&c.subcat!==activeSub)return false;
+    if(search&&!c.name.toLowerCase().includes(search)&&!(c.nameSub||'').toLowerCase().includes(search))return false;
+    return true;
+  });
+  var count='수집 '+filtered.length+' / '+chars.length;
+  var el1=document.getElementById('char-count');if(el1)el1.textContent=count;
+  var el2=document.getElementById('char-count2');if(el2)el2.textContent=count;
+  var grid=document.getElementById('card-grid');if(!grid)return;
+  grid.innerHTML='';
+  filtered.forEach(function(c){
+    var card=document.createElement('div');
+    card.className='char-card'+(currentChar&&currentChar.id===c.id?' active-card':'');
+    card.onclick=function(){openDetail(c);};
+    var imgHtml=c.img
+      ?'<img class="char-card-img" src="'+c.img+'" style="object-fit:'+(c.imgFit||'cover')+';object-position:'+(c.imgPos||'center top')+'" alt="">'
+      :'<div class="char-card-placeholder">'+(c.name?c.name[0]:'✦')+'</div>';
+    card.innerHTML=imgHtml
+      +'<div class="char-card-overlay"></div>'
+      +'<div class="char-card-bottom"><div class="char-card-name">'+c.name+'</div><div class="char-card-role">'+(c.role||c.category||'')+'</div></div>';
+    grid.appendChild(card);
+  });
+}
+
+// ── DETAIL ──
+var themePlayer=null,themeIsPlaying=false;
+function openDetail(c,auIdx){
+  currentChar=c;currentAuIdx=auIdx||0;
+  var img=c.img;var fit=c.imgFit||'cover';var pos=c.imgPos||'center top';
+  if(c.auVersions&&c.auVersions.length>0&&auIdx>0){var au=c.auVersions[auIdx-1];if(au&&au.img){img=au.img;fit=au.imgFit||fit;pos=au.imgPos||pos;}}
+  var ci=document.getElementById('game-char-img');var cp=document.getElementById('game-placeholder');
+  if(img){ci.src=img;ci.style.display='block';ci.style.objectFit=fit;ci.style.objectPosition=pos;cp.style.display='none';}
+  else{ci.style.display='none';cp.style.display='flex';cp.textContent=c.name?c.name[0]:'✦';}
+  document.getElementById('game-topbar-title').textContent=c.name+(c.nameSub?' — '+c.nameSub:'');
+  document.getElementById('game-topbar-id').textContent='#'+(c.tag||c.id);
+  document.getElementById('game-file-id').textContent=c.tag||'';
+  document.getElementById('game-name').textContent=c.name;
+  document.getElementById('game-sub').textContent=c.nameSub||'';
+  document.getElementById('game-role').textContent=c.role||'';
+  document.getElementById('game-role2').textContent=c.role||'';
+  document.getElementById('game-stars').textContent='★'.repeat(c.stars||5)+'☆'.repeat(5-(c.stars||5));
+  document.getElementById('game-desc').textContent=c.desc||'';
+  document.getElementById('game-story').textContent=c.story||'';
+  // profile table
+  var tbl=document.getElementById('game-profile-table');tbl.innerHTML='';
+  var profile=Array.isArray(c.profile)?c.profile:[];
+  profile.forEach(function(row){var tr=document.createElement('tr');tr.innerHTML='<td>'+row.k+'</td><td>'+row.v+'</td>';tbl.appendChild(tr);});
+  // gallery
+  var gal=document.getElementById('game-gallery');gal.innerHTML='';
+  (c.gallery||[]).forEach(function(src){var img2=document.createElement('img');img2.className='game-gallery-img';img2.src=src;gal.appendChild(img2);});
+  // novel
+  var nov=document.getElementById('game-novel');nov.innerHTML='';
+  (c.vnLines||[]).forEach(function(ln){var d=document.createElement('div');d.className='game-novel-line';d.innerHTML='<div class="game-novel-speaker">'+(ln.speaker||'')+'</div><div class="game-novel-text">'+ln.text+'</div>';nov.appendChild(d);});
+  // AU buttons
+  var auBtns=document.getElementById('au-buttons');auBtns.innerHTML='';
+  var def=document.createElement('button');def.className='au-btn'+((currentAuIdx===0)?' active':'');def.textContent='Default';def.onclick=function(){openDetail(c,0);};auBtns.appendChild(def);
+  (c.auVersions||[]).forEach(function(au,i){var btn=document.createElement('button');btn.className='au-btn'+(currentAuIdx===i+1?' active':'');btn.textContent=au.label||('Ver.'+(i+1));btn.onclick=function(){openDetail(c,i+1);};auBtns.appendChild(btn);});
+  // theme
+  stopTheme();
+  var theme=c.theme||{};
+  var tp=document.getElementById('theme-player');
+  if(theme.title){tp.style.display='flex';document.getElementById('theme-title').textContent=theme.title;document.getElementById('theme-artist').textContent=theme.artist||'';document.getElementById('theme-play-btn').textContent='▶';themeIsPlaying=false;window._themeYtId=theme.youtubeId||'';window._themeFileData=theme.fileData||'';}
+  else{tp.style.display='none';window._themeYtId='';window._themeFileData='';}
+  // animate
+  document.querySelectorAll('.game-info-block').forEach(function(b,i){b.classList.remove('visible');setTimeout(function(){b.classList.add('visible');},80+i*100);});
+  document.getElementById('btn-edit').style.display=window._isAdmin?'block':'none';
+  switchTab('info',document.querySelector('.game-tab'));
+  document.getElementById('detail-screen').classList.add('active');
+  renderGrid();
+}
+function closeDetail(){document.getElementById('detail-screen').classList.remove('active');currentChar=null;stopTheme();renderGrid();}
+function switchTab(name,btn){
+  document.querySelectorAll('.game-tab').forEach(function(t){t.classList.remove('active');});
+  document.querySelectorAll('.game-tab-content').forEach(function(t){t.classList.remove('active');});
+  if(btn)btn.classList.add('active');else{var fb=document.querySelector('.game-tab');if(fb)fb.classList.add('active');}
+  var el=document.getElementById('gtab-'+name);if(el)el.classList.add('active');
+}
+
+// ── THEME SONG ──
+window._themeYtId='';window._themeFileData='';window._themeAudio=null;
+function toggleTheme(){
+  if(window._themeFileData){
+    if(!window._themeAudio){window._themeAudio=new Audio(window._themeFileData);window._themeAudio.loop=true;window._themeAudio.volume=0.8;}
+    if(themeIsPlaying){window._themeAudio.pause();themeIsPlaying=false;document.getElementById('theme-play-btn').textContent='▶';}
+    else{window._themeAudio.play();themeIsPlaying=true;document.getElementById('theme-play-btn').textContent='⏸';}
+    return;
+  }
+  if(!window._themeYtId)return;
+  if(!themePlayer){
+    document.getElementById('theme-yt-container').innerHTML='<div id="theme-yt-iframe"></div>';
+    var s=document.createElement('script');s.src='https://www.youtube.com/iframe_api';document.head.appendChild(s);
+    if(window.YT&&window.YT.Player){
+      themePlayer=new YT.Player('theme-yt-iframe',{height:'1',width:'1',videoId:window._themeYtId,playerVars:{autoplay:1,loop:1,playlist:window._themeYtId},events:{onReady:function(e){e.target.setVolume(80);}}});
+    } else {
+      window.onYouTubeIframeAPIReady=function(){themePlayer=new YT.Player('theme-yt-iframe',{height:'1',width:'1',videoId:window._themeYtId,playerVars:{autoplay:1,loop:1,playlist:window._themeYtId},events:{onReady:function(e){e.target.setVolume(80);}}});};
+    }
+    themeIsPlaying=true;document.getElementById('theme-play-btn').textContent='⏸';return;
+  }
+  if(themeIsPlaying){themePlayer.pauseVideo();themeIsPlaying=false;document.getElementById('theme-play-btn').textContent='▶';}
+  else{themePlayer.playVideo();themeIsPlaying=true;document.getElementById('theme-play-btn').textContent='⏸';}
+}
+function stopTheme(){
+  if(window._themeAudio){window._themeAudio.pause();window._themeAudio=null;}
+  if(themePlayer){try{themePlayer.stopVideo();}catch(e){}}
+  themePlayer=null;themeIsPlaying=false;
+  document.getElementById('theme-yt-container').innerHTML='';
+}
+
+// ── IMAGE UPLOAD ──
+function handleImgUpload(input){
+  var file=input.files[0];if(!file)return;
+  var reader=new FileReader();
+  reader.onload=function(e){document.getElementById('ep-img-data').value=e.target.result;updateImgPreview(e.target.result);};
+  reader.readAsDataURL(file);
+}
+function previewUrl(){updateImgPreview(document.getElementById('ep-img-data').value.trim());}
+function updateImgPreview(src){
+  var p=document.getElementById('ep-img-preview');if(!p)return;
+  if(src){var fit=document.getElementById('ep-img-fit').value,pos=document.getElementById('ep-img-pos').value;p.innerHTML='<img src="'+src+'" style="width:100%;height:100%;object-fit:'+fit+';object-position:'+pos+'">';}
+  else p.innerHTML='이미지 없음';
+}
+function updateImgStyle(){
+  var src=document.getElementById('ep-img-data').value.trim();if(src)updateImgPreview(src);
+}
+
+// ── GALLERY ──
+function handleGalleryUpload(input){
+  var files=Array.from(input.files);
+  files.forEach(function(file){var r=new FileReader();r.onload=function(e){epGalleryData.push(e.target.result);renderGalleryList();};r.readAsDataURL(file);});
+}
+function renderGalleryList(){
+  var el=document.getElementById('ep-gallery-list');if(!el)return;
+  if(!epGalleryData.length){el.innerHTML='<div style="font-size:11px;color:var(--text-muted);">갤러리 없음</div>';return;}
+  el.innerHTML='';
+  epGalleryData.forEach(function(src,i){
+    var d=document.createElement('div');d.style.cssText='display:flex;align-items:center;gap:6px;margin-bottom:4px;';
+    d.innerHTML='<img src="'+src+'" style="width:36px;height:36px;object-fit:cover;">'
+      +'<button onclick="removeGalleryItem('+i+')" style="background:transparent;border:none;color:rgba(192,57,43,.7);cursor:pointer;">✕</button>';
+    el.appendChild(d);
+  });
+}
+function removeGalleryItem(i){epGalleryData.splice(i,1);renderGalleryList();}
+
+// ── AU ──
+var epAuData=[];
+function renderAUList(){
+  var el=document.getElementById('ep-au-list');if(!el)return;el.innerHTML='';
+  epAuData.forEach(function(au,i){
+    var item=document.createElement('div');item.className='au-edit-item';
+    item.innerHTML='<div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">'
+      +'<input class="form-input au-label" placeholder="버전명" value="'+(au.label||'')+'" style="flex:1;">'
+      +'<button onclick="removeAU('+i+')" class="btn-del">✕</button></div>'
+      +'<div class="au-preview" id="au-preview-'+i+'">'+(au.img?'<img src="'+au.img+'" style="width:100%;height:100%;object-fit:cover;object-position:top;">':'이미지 없음')+'</div>'
+      +'<label class="file-input-label" style="margin-top:4px;">📁 파일<input type="file" accept="image/*" onchange="handleAUImgUpload(this,'+i+')"></label>'
+      +'<input class="form-input au-img" placeholder="또는 URL" value="'+(au.img||'')+'" style="margin-top:4px;" oninput="updateAUPreview('+i+',this.value)">'
+      +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:4px;">'
+      +'<select class="form-input au-fit"><option value="contain"'+(au.imgFit==='contain'?' selected':'')+'>Contain</option><option value="cover"'+(au.imgFit==='cover'?' selected':'')+'>Cover</option></select>'
+      +'<select class="form-input au-pos"><option value="center top"'+(au.imgPos==='center top'?' selected':'')+'>상단</option><option value="center center"'+(au.imgPos==='center center'?' selected':'')+'>중앙</option><option value="center bottom"'+(au.imgPos==='center bottom'?' selected':'')+'>하단</option></select>'
+      +'</div>';
+    el.appendChild(item);
+  });
+}
+function addAUItem(){epAuData.push({label:'',img:'',imgFit:'contain',imgPos:'center top'});renderAUList();}
+function removeAU(i){epAuData.splice(i,1);renderAUList();}
+function handleAUImgUpload(input,i){
+  var file=input.files[0];if(!file)return;
+  var r=new FileReader();r.onload=function(e){epAuData[i]=epAuData[i]||{};epAuData[i].img=e.target.result;renderAUList();};r.readAsDataURL(file);
+}
+function updateAUPreview(i,src){
+  var el=document.getElementById('au-preview-'+i);if(!el)return;
+  el.innerHTML=src?'<img src="'+src+'" style="width:100%;height:100%;object-fit:cover;object-position:top;">':'이미지 없음';
+}
+
+// ── PROFILE DRAG ──
+function renderProfileRows(profile){
+  var el=document.getElementById('ep-profile-rows');if(!el)return;el.innerHTML='';
+  profile.forEach(function(row){addProfileRowWithVal(row.k,row.v);});
+}
+function addProfileRow(){addProfileRowWithVal('','');}
+function addProfileRowWithVal(k,v){
+  var container=document.getElementById('ep-profile-rows');
+  var item=document.createElement('div');item.className='profile-drag-item';item.draggable=true;
+  item.innerHTML='<span class="drag-handle">⠿</span>'
+    +'<input class="form-input prof-key" value="'+k+'" placeholder="항목">'
+    +'<input class="form-input prof-val" value="'+v+'" placeholder="내용" style="flex:1;">'
+    +'<button onclick="this.parentNode.remove()" style="background:transparent;border:none;color:var(--text-muted);cursor:pointer;">✕</button>';
+  item.addEventListener('dragstart',function(e){dragSrcIndex=Array.from(container.children).indexOf(item);e.dataTransfer.effectAllowed='move';});
+  item.addEventListener('dragover',function(e){e.preventDefault();item.classList.add('drag-over');});
+  item.addEventListener('dragleave',function(){item.classList.remove('drag-over');});
+  item.addEventListener('drop',function(e){e.preventDefault();item.classList.remove('drag-over');var target=Array.from(container.children).indexOf(item);if(dragSrcIndex===null||dragSrcIndex===target)return;var items=Array.from(container.children);var src=items[dragSrcIndex];if(dragSrcIndex<target)container.insertBefore(src,item.nextSibling);else container.insertBefore(src,item);dragSrcIndex=null;});
+  container.appendChild(item);
+}
+
+// ── VN ──
+function renderVNRows(lines){
+  var el=document.getElementById('ep-vn-rows');if(!el)return;el.innerHTML='';
+  (lines||[]).forEach(function(ln){addVNRowVal(ln.speaker||'',ln.text||'');});
+}
+function addVNRow(){addVNRowVal('','');}
+function addVNRowVal(sp,tx){
+  var container=document.getElementById('ep-vn-rows');
+  var row=document.createElement('div');row.className='vn-row';
+  row.innerHTML='<input class="form-input vn-speaker" value="'+sp+'" placeholder="화자">'
+    +'<input class="form-input vn-text" value="'+tx+'" placeholder="대사" style="flex:1;">'
+    +'<button onclick="this.parentNode.remove()" style="background:transparent;border:none;color:var(--text-muted);cursor:pointer;">✕</button>';
+  container.appendChild(row);
+}
+
+// ── EDIT PANEL ──
+function openEditPanel(){
+  if(!currentChar||!window._isAdmin)return;
+  var c=currentChar;
+  document.getElementById('ep-name').value=c.name;
+  document.getElementById('ep-namesub').value=c.nameSub||'';
+  document.getElementById('ep-role').value=c.role||'';
+  document.getElementById('ep-faction').value=c.faction||'';
+  var sel=document.getElementById('ep-category');
+  sel.innerHTML=getCats().map(function(cat){return'<option value="'+cat+'"'+(c.category===cat?' selected':'')+'>'+cat+'</option>';}).join('');
+  document.getElementById('ep-subcat').value=c.subcat||'';
+  document.getElementById('ep-tag').value=c.tag||'';
+  document.getElementById('ep-stars').value=c.stars||5;
+  var theme=c.theme||{};
+  document.getElementById('ep-theme-title').value=theme.title||'';
+  document.getElementById('ep-theme-artist').value=theme.artist||'';
+  document.getElementById('ep-theme-yt').value=theme.youtubeId||'';
+  document.getElementById('ep-theme-file-data').value=theme.fileData||'';
+  document.getElementById('theme-file-name').textContent=theme.fileData?'✓ 파일있음':'';
+  setThemeSrc(theme.fileData?'file':'yt');
+  var imgVal=c.img||'';
+  document.getElementById('ep-img-data').value=imgVal;
+  document.getElementById('ep-img-fit').value=c.imgFit||'contain';
+  document.getElementById('ep-img-pos').value=c.imgPos||'center top';
+  updateImgPreview(imgVal);
+  document.getElementById('ep-desc').value=c.desc||'';
+  document.getElementById('ep-story').value=c.story||'';
+  var profile=Array.isArray(c.profile)?c.profile:Object.keys(c.profile||{}).map(function(k){return{k:k,v:c.profile[k]};});
+  renderProfileRows(profile);
+  epGalleryData=c.gallery?[...c.gallery]:[];
+  renderGalleryList();
+  renderVNRows(c.vnLines||[]);
+  epAuData=c.auVersions?JSON.parse(JSON.stringify(c.auVersions)):[];
+  renderAUList();
+  document.getElementById('edit-panel').classList.add('active');
+}
+function closeEditPanel(){document.getElementById('edit-panel').classList.remove('active');}
+function setThemeSrc(src){
+  document.getElementById('theme-yt-input').style.display=src==='yt'?'block':'none';
+  document.getElementById('theme-file-input').style.display=src==='file'?'block':'none';
+  document.getElementById('theme-src-yt').classList.toggle('active',src==='yt');
+  document.getElementById('theme-src-file').classList.toggle('active',src==='file');
+}
+function handleThemeFileUpload(input){
+  var file=input.files[0];if(!file)return;
+  var r=new FileReader();
+  r.onload=function(e){document.getElementById('ep-theme-file-data').value=e.target.result;document.getElementById('theme-file-name').textContent='✓ '+file.name;};
+  r.readAsDataURL(file);
+}
+function saveChar(){
+  if(!currentChar||!window._isAdmin)return;
+  var chars=getChars(),idx=chars.findIndex(function(c){return c.id===currentChar.id;});if(idx<0)return;
+  var profile=[];document.querySelectorAll('#ep-profile-rows .profile-drag-item').forEach(function(item){var k=item.querySelector('.prof-key').value.trim(),v=item.querySelector('.prof-val').value;if(k)profile.push({k:k,v:v});});
+  var vnLines=[];document.querySelectorAll('.vn-speaker').forEach(function(s,i){var t=document.querySelectorAll('.vn-text')[i];if(t&&t.value.trim())vnLines.push({speaker:s.value,text:t.value.trim()});});
+  var isFileTheme=document.getElementById('theme-file-input').style.display==='block';
+  var themeFileData=document.getElementById('ep-theme-file-data').value;
+  var ytRaw=document.getElementById('ep-theme-yt').value.trim();
+  var m=ytRaw.match(/(?:youtu\.be\/|v=|embed\/)([A-Za-z0-9_-]{11})/);var ytId=m?m[1]:ytRaw;
+  var auItems=document.querySelectorAll('#ep-au-list .au-edit-item');
+  var auVersions=[];
+  auItems.forEach(function(item,i){
+    if(i>=epAuData.length)return;
+    auVersions.push({label:item.querySelector('.au-label').value,img:item.querySelector('.au-img').value.trim()||epAuData[i].img||'',imgFit:item.querySelector('.au-fit').value,imgPos:item.querySelector('.au-pos').value});
+  });
+  chars[idx]={id:currentChar.id,name:document.getElementById('ep-name').value,nameSub:document.getElementById('ep-namesub').value,role:document.getElementById('ep-role').value,faction:document.getElementById('ep-faction').value,category:document.getElementById('ep-category').value,subcat:document.getElementById('ep-subcat').value,tag:document.getElementById('ep-tag').value,stars:parseInt(document.getElementById('ep-stars').value)||5,img:document.getElementById('ep-img-data').value.trim(),imgFit:document.getElementById('ep-img-fit').value,imgPos:document.getElementById('ep-img-pos').value,desc:document.getElementById('ep-desc').value,story:document.getElementById('ep-story').value,gallery:epGalleryData,novel:chars[idx].novel||[],vnLines:vnLines,profile:profile,theme:{title:document.getElementById('ep-theme-title').value,artist:document.getElementById('ep-theme-artist').value,youtubeId:isFileTheme?'':ytId,fileData:isFileTheme?themeFileData:''},auVersions:auVersions};
+  setChars(chars);currentChar=chars[idx];
+  openDetail(currentChar,currentAuIdx);
+  var msg=document.getElementById('ep-save-msg');msg.style.display='block';setTimeout(function(){msg.style.display='none';},2000);
+}
+
+// ── BGM ──
+var ytPlayer=null;
+(function initBGM(){
+  var fromSession=false;
+  try{
+    var raw=sessionStorage.getItem('bgm_state');
+    if(raw){
+      var st=JSON.parse(raw);
+      if(st.ytId){
+        window._bgmYtId=st.ytId;
+        document.getElementById('bgm-title').textContent=st.title||'BGM';
+        document.getElementById('bgm-artist').textContent=st.artist||'';
+        document.getElementById('bgm-vol').value=st.volume||40;
+        fromSession=true;
+        var el=document.getElementById('bgm-player');
+        if(st.collapsed)el.classList.add('collapsed');
+        if(st.posLeft&&st.posTop){el.style.right='auto';el.style.bottom='auto';el.style.left=st.posLeft;el.style.top=st.posTop;}
+        if(st.playing){setTimeout(function(){document.getElementById('bgm-play-btn').click();},900);}
+      }
+    }
+  }catch(e){}
+  if(!fromSession&&window._fbGet&&window._fbRef&&window._db){
+    window._fbGet(window._fbRef(window._db,'site/bgm')).then(function(snap){
+      if(snap.exists()){var bgm=snap.val();window._bgmYtId=bgm.youtubeId||'';document.getElementById('bgm-title').textContent=bgm.title||'BGM';document.getElementById('bgm-artist').textContent=bgm.artist||'';document.getElementById('bgm-vol').value=40;if(window._bgmYtId){setTimeout(function(){document.getElementById('bgm-play-btn').click();},1000);}}
+    }).catch(function(){});
+  }
+})();
+
+document.getElementById('bgm-play-btn').addEventListener('click',function(){
+  if(!window._bgmYtId)return;
+  if(!ytPlayer){
+    document.getElementById('yt-container').innerHTML='<div id="yt-iframe"></div>';
+    var sc=document.createElement('script');sc.src='https://www.youtube.com/iframe_api';document.head.appendChild(sc);
+    window.onYouTubeIframeAPIReady=function(){ytPlayer=new YT.Player('yt-iframe',{height:'1',width:'1',videoId:window._bgmYtId,playerVars:{autoplay:1,loop:1,playlist:window._bgmYtId},events:{onReady:function(e){e.target.setVolume(document.getElementById('bgm-vol').value);}}});};
+    window._bgmIsPlaying=true;this.textContent='⏸';return;
+  }
+  if(window._bgmIsPlaying){ytPlayer.pauseVideo();window._bgmIsPlaying=false;this.textContent='▶';}
+  else{ytPlayer.playVideo();window._bgmIsPlaying=true;this.textContent='⏸';}
+});
+
+// ── BGM DRAG ──
+(function(){
+  var el=document.getElementById('bgm-player');
+  var rect=el.getBoundingClientRect();
+  el.style.right='auto';el.style.bottom='auto';el.style.left=rect.left+'px';el.style.top=rect.top+'px';
+  var dragging=false,didDrag=false,ox=0,oy=0,sx=0,sy=0;
+  function startDrag(e){
+    var isCollapsed=el.classList.contains('collapsed');
+    if(!isCollapsed&&(e.target.tagName==='BUTTON'||e.target.tagName==='INPUT'))return;
+    dragging=true;didDrag=false;ox=e.clientX;oy=e.clientY;
+    var r=el.getBoundingClientRect();sx=r.left;sy=r.top;
+    el.style.right='auto';el.style.bottom='auto';el.style.left=sx+'px';el.style.top=sy+'px';
+    e.preventDefault();
+  }
+  function onMove(e){
+    if(!dragging)return;
+    var dx=e.clientX-ox,dy=e.clientY-oy;
+    if(Math.abs(dx)>3||Math.abs(dy)>3)didDrag=true;
+    var nx=sx+dx,ny=sy+dy;
+    nx=Math.max(0,Math.min(window.innerWidth-el.offsetWidth,nx));
+    ny=Math.max(0,Math.min(window.innerHeight-el.offsetHeight,ny));
+    el.style.left=nx+'px';el.style.top=ny+'px';
+  }
+  el.addEventListener('mousedown',startDrag);
+  document.addEventListener('mousemove',onMove);
+  document.addEventListener('mouseup',function(){dragging=false;});
+  el.addEventListener('touchstart',function(e){var t=e.touches[0];startDrag({clientX:t.clientX,clientY:t.clientY,target:e.target,preventDefault:function(){e.preventDefault();}});},{passive:false});
+  document.addEventListener('touchmove',function(e){var t=e.touches[0];onMove({clientX:t.clientX,clientY:t.clientY});});
+  document.addEventListener('touchend',function(){dragging=false;});
+  document.getElementById('bgm-toggle-collapse').addEventListener('click',function(e){
+    e.stopPropagation();el.classList.add('collapsed');
+    setTimeout(function(){var r=el.getBoundingClientRect();el.style.right='auto';el.style.bottom='auto';el.style.left=r.left+'px';el.style.top=r.top+'px';},350);
+  });
+  document.getElementById('bgm-expand-btn').addEventListener('click',function(e){if(didDrag){didDrag=false;return;}el.classList.remove('collapsed');});
+  document.getElementById('bgm-vol').addEventListener('input',function(){if(ytPlayer)ytPlayer.setVolume(this.value);});
+})();
+
+function saveBGMState(){
+  try{
+    var el=document.getElementById('bgm-player');
+    sessionStorage.setItem('bgm_state',JSON.stringify({ytId:window._bgmYtId||'',title:document.getElementById('bgm-title').textContent||'',artist:document.getElementById('bgm-artist').textContent||'',volume:document.getElementById('bgm-vol').value||40,playing:window._bgmIsPlaying||false,collapsed:el.classList.contains('collapsed'),posLeft:el.style.left||'',posTop:el.style.top||''}));
+  }catch(e){}
+}
+window.addEventListener('beforeunload',saveBGMState);
+window.addEventListener('pagehide',saveBGMState);
+
+// ── INIT ──
+activeCat='all';
+renderCategoryFilters();
+renderGrid();
+if(window.syncOCFromFirebase){window.syncOCFromFirebase(function(){renderCategoryFilters();renderGrid();});}
+</script>
+</body>
+</html>
