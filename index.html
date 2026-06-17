@@ -337,6 +337,78 @@ html,body{overflow:hidden!important;}
   .content-block.active:not(#page-main) .page-sub,.content-block.active:not(#page-main) .world-cards,.content-block.active:not(#page-main) #notice-list,.content-block.active:not(#page-main) #public-diary-list,.content-block.active:not(#page-main) #public-gallery-grid,.content-block.active:not(#page-main) #public-banner-list,.content-block.active:not(#page-main) #guest-list,.content-block.active:not(#page-main) .page-coming,#trpg-cards,#page-trpg > .world-card-item{width:100%!important;max-width:none!important;margin-left:0!important;}
 }
 </style>
+<style id="lakehouse-final-visual-tuning-css">
+/* Final visual tuning for background, title, TRPG and guest layout. */
+.bg-layer{
+  background:
+    linear-gradient(90deg,rgba(5,6,5,.78) 0 15%,rgba(5,6,5,.52) 15% 23%,rgba(8,9,8,.12) 31%,rgba(8,9,8,.18) 100%),
+    linear-gradient(180deg,rgba(9,10,9,.14),rgba(9,10,9,.38)),
+    url('갠홈/Gemini_Generated_Image_konholkonholkonh.png') center center/cover no-repeat!important;
+}
+.bg-layer::before{
+  content:"";position:absolute;inset:0;
+  background:radial-gradient(circle at 51% 18%,rgba(240,207,173,.2),transparent 19%),repeating-radial-gradient(circle at 51% 18%,rgba(240,207,173,.1) 0 1px,transparent 1px 9px);
+  mask-image:linear-gradient(90deg,transparent 0 19%,rgba(0,0,0,.82) 29%,black 100%);
+  pointer-events:none;
+}
+.bg-layer::after{background:linear-gradient(90deg,rgba(0,0,0,.22),transparent 28%,rgba(0,0,0,.06))!important;}
+.left-panel{background:linear-gradient(90deg,rgba(5,6,5,.93),rgba(5,6,5,.72) 68%,rgba(5,6,5,.3))!important;}
+.site-title{
+  font-family:'My Soul','Pinyon Script','Cormorant Garamond',serif!important;
+  font-size:31px!important;
+  line-height:.92!important;
+  letter-spacing:.02em!important;
+  text-transform:none!important;
+  font-style:normal!important;
+  font-weight:400!important;
+  color:#f0cfad!important;
+  text-shadow:0 0 16px rgba(215,169,130,.35),0 10px 24px rgba(0,0,0,.5)!important;
+}
+.site-title span{color:#e6b895!important;}
+#page-trpg #trpg-cards,
+#page-trpg > .world-card-item{
+  width:min(700px,calc(100vw - 440px))!important;
+  max-width:700px!important;
+  box-sizing:border-box!important;
+}
+#page-trpg > .world-card-item{
+  min-height:90px!important;
+  margin:12px 0 0 0!important;
+  padding:1rem 1.25rem!important;
+}
+#page-trpg #trpg-cards .page-coming,
+#page-trpg #trpg-cards .world-card-item{width:100%!important;max-width:100%!important;box-sizing:border-box!important;}
+#page-guest #guest-list{width:min(700px,calc(100vw - 440px))!important;max-width:700px!important;min-height:0!important;}
+#page-guest #guest-list>div{box-sizing:border-box!important;}
+#page-guest #guest-login-notice{
+  display:inline-flex!important;
+  width:auto!important;
+  min-width:0!important;
+  max-width:max-content!important;
+  min-height:0!important;
+  padding:9px 14px!important;
+  margin:2px 0 1rem 0!important;
+  transform:translateX(-78px)!important;
+  box-sizing:border-box!important;
+  white-space:nowrap!important;
+  background:linear-gradient(135deg,rgba(16,18,16,.76),rgba(37,37,32,.56))!important;
+  border:1px solid rgba(215,169,130,.22)!important;
+}
+#page-guest #guest-form-inner{
+  width:min(700px,calc(100vw - 440px))!important;
+  max-width:700px!important;
+  transform:translateX(-78px)!important;
+  margin-left:0!important;
+  box-sizing:border-box!important;
+}
+#page-guest #guest-form-inner .form-group{width:100%!important;margin:0 0 12px 0!important;box-sizing:border-box!important;}
+#page-guest #guest-form-inner .form-input{width:100%!important;box-sizing:border-box!important;margin:0!important;}
+@media(max-width:900px){
+  #page-guest #guest-login-notice,#page-guest #guest-form-inner{transform:none!important;}
+  #page-guest #guest-login-notice{white-space:normal!important;max-width:100%!important;}
+  #page-trpg #trpg-cards,#page-trpg > .world-card-item,#page-guest #guest-list,#page-guest #guest-form-inner{width:100%!important;max-width:none!important;}
+}
+</style>
 </head>
 <body>
 
@@ -1693,6 +1765,21 @@ document.querySelectorAll('.auth-input').forEach(function(inp){inp.addEventListe
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install);else install();
   setTimeout(install,300);
   setTimeout(install,1200);
+})();
+</script>
+<script id="lakehouse-bgm-persist-guard-js">
+(function(){
+  var STATE_KEY='lh_bgm_shared_state';
+  function read(){try{return JSON.parse(localStorage.getItem(STATE_KEY)||'{}')}catch(e){return {}}}
+  function write(v){try{localStorage.setItem(STATE_KEY,JSON.stringify(Object.assign(read(),v||{},{updatedAt:Date.now()})))}catch(e){}}
+  function remember(){
+    if(!window.LakeBGM||!LakeBGM.getState)return;
+    var s=LakeBGM.getState();
+    if(s&&(s.id||s.ytId||s.fileData))write({kind:s.kind,id:s.id||s.ytId||s.fileData,ytId:s.kind==='youtube'?(s.id||s.ytId):'',fileData:s.kind==='file'?(s.id||s.fileData):'',title:s.title,artist:s.artist,scope:s.scope,playing:!!s.playing,currentTime:s.currentTime||0,volume:s.volume});
+  }
+  window.addEventListener('pagehide',remember,{capture:true});
+  window.addEventListener('beforeunload',remember,{capture:true});
+  document.addEventListener('visibilitychange',function(){if(document.visibilityState==='hidden')remember()},{capture:true});
 })();
 </script>
 </body>
