@@ -643,11 +643,14 @@ html,body{overflow:hidden!important;}
       <div class="content-block" id="page-guest">
         <div class="page-heading">Guest</div>
         <div class="page-sub">방명록</div>
-        <div id="guest-list"><div class="page-coming">— 아직 방명록이 없습니다 —</div></div>
-        <div style="margin-top:1.5rem;">
-          <div style="font-size:11px;color:var(--text-muted);margin-bottom:1rem;padding:8px 12px;background:var(--bg2);border:1px solid var(--border);letter-spacing:0.06em;" id="guest-login-notice">
-            방명록 작성은 로그인 후 가능합니다.
-          </div>
+        <!-- 안내 박스: 맨 위, 크기 그대로 -->
+        <div style="font-size:11px;color:var(--text-muted);margin-bottom:1.5rem;padding:8px 12px;background:var(--bg2);border:1px solid var(--border);letter-spacing:0.06em;display:inline-block;" id="guest-login-notice">
+          방명록 작성은 로그인 후 가능합니다.
+        </div>
+
+        <!-- 방명록 목록 + 입력 폼: 동일 너비 컨테이너로 묶기 -->
+        <div style="display:flex;flex-direction:column;gap:1.25rem;max-width:520px;">
+          <div id="guest-list"><div class="page-coming">— 아직 방명록이 없습니다 —</div></div>
           <div id="guest-form-inner" style="display:none;">
             <div class="form-group"><label class="form-label">닉네임 <span style="color:var(--text-muted);font-size:10px;">(비우면 익명)</span></label><input class="form-input auth-input" id="guest-name" placeholder="닉네임 (비우면 익명)"></div>
             <div class="form-group"><label class="form-label">메시지</label><textarea class="form-input auth-input" id="guest-msg" rows="3" placeholder="남기고 싶은 말을 적어주세요"></textarea></div>
